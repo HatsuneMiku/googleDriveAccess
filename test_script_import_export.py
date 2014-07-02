@@ -30,7 +30,7 @@ MANIFEST = 'manifest.json'
 SCRIPT_TYPE = 'application/vnd.google-apps.script+json'
 SCRIPT_FOLDER = 'script_import_export'
 SCRIPT_ID = 'SCRIPT_ID_YOU_WISH_TO_HANDLE'
-SCRIPT_NAME = 'SCRIPT_NAME_YOU_WISH_TO_HANDLE'
+SCRIPT_NAME = 'test_GoogleAppsScript_createCalendarEvent'
 
 def script_upload(drive_service, basedir, folder, id, name, create=False):
   foldername = os.path.join(basedir, folder, name)

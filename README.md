@@ -22,15 +22,17 @@ How to use it
 
 - execute ./test_script_prefetch.py to test Drive API search with query
 
-- create directory './script_import_export' for tests below
+- edit test_script_import_export.py (set 'mode = 0') to test create new Google Apps Script 'test_GoogleAppsScript_createCalendarEvent' for tests below
 
-- edit test_script_import_export.py to test download (comment #script_upload(...))
+- execute test_script_import_export.py to test create and *'get SCRIPT_ID'*
+
+- edit test_script_import_export.py (set 'mode = 2' and *'set SCRIPT_ID'*) to test download
 
 - execute test_script_import_export.py to test download
 
-- edit downloaded script './script_import_export/[your Google Apps Script projectname]/Code.gs'
+- edit downloaded script './script_import_export/test_GoogleAppsScript_createCalendarEvent/Code.gs'
 
-- edit test_script_import_export.py to test upload (comment #script_download(...))
+- edit test_script_import_export.py (set 'mode = 1') to test upload
 
 - execute test_script_import_export.py to test upload
 
