@@ -55,11 +55,12 @@
 <li><p>execute ./test_upload_first.py to test OAuth2 flow and store credentials</p></li>
 <li><p>execute ./test_upload_second.py to test OAuth2 using stored credentials</p></li>
 <li><p>execute ./test_script_prefetch.py to test Drive API search with query</p></li>
-<li><p>create directory './script_import_export' for tests below</p></li>
-<li><p>edit test_script_import_export.py to test download (comment #script_upload(...))</p></li>
+<li><p>edit test_script_import_export.py (set 'mode = 0') to test create new Google Apps Script 'test_GoogleAppsScript_createCalendarEvent' for tests below</p></li>
+<li><p>execute test_script_import_export.py to test create and <em>'get SCRIPT_ID'</em></p></li>
+<li><p>edit test_script_import_export.py (set 'mode = 2' and <em>'set SCRIPT_ID'</em>) to test download</p></li>
 <li><p>execute test_script_import_export.py to test download</p></li>
-<li><p>edit downloaded script './script_import_export/[your Google Apps Script projectname]/Code.gs'</p></li>
-<li><p>edit test_script_import_export.py to test upload (comment #script_download(...))</p></li>
+<li><p>edit downloaded script './script_import_export/test_GoogleAppsScript_createCalendarEvent/Code.gs'</p></li>
+<li><p>edit test_script_import_export.py (set 'mode = 1') to test upload</p></li>
 <li><p>execute test_script_import_export.py to test upload</p></li>
 </ul>
       </section>
