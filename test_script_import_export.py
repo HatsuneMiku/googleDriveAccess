@@ -32,7 +32,7 @@ SCRIPT_FOLDER = 'script_import_export'
 SCRIPT_ID = 'SCRIPT_ID_YOU_WISH_TO_HANDLE'
 SCRIPT_NAME = 'SCRIPT_NAME_YOU_WISH_TO_HANDLE'
 
-def script_upload(drive_service, basedir, folder, id, name):
+def script_upload(drive_service, basedir, folder, id, name, create=False):
   foldername = os.path.join(basedir, folder, name)
   logger.info('prepare folder: %s' % foldername)
   manifest_path = os.path.join(foldername, MANIFEST)
@@ -46,7 +46,7 @@ def script_upload(drive_service, basedir, folder, id, name):
     filename = '%s%s' % (fileInProject['name'], extension)
     logger.info('- file%04d: %s' % (i, filename))
     f = open(os.path.join(foldername, filename), 'rb')
-    fileInProject['source'] = f.read()
+    fileInProject['source'] = f.read().decode('utf-8') # to unicode json string
     f.close()
   # last import manifest.json
   logger.info('- manifest: %s' % MANIFEST)
@@ -57,13 +57,16 @@ def script_upload(drive_service, basedir, folder, id, name):
   # body = {'title': name, 'mimeType': SCRIPT_TYPE, 'description': name}
   body = {'mimeType': SCRIPT_TYPE}
   mbody = MediaFileUpload(manifest_path, mimetype=SCRIPT_TYPE, resumable=True)
-  if False: # create new Apps Script project
+  if create: # create new Apps Script project
     fileobj = drive_service.files().insert(
       body=body, media_body=mbody).execute()
   else: # overwrite exists Apps Script project
     fileobj = drive_service.files().update(
       fileId=id, body=body, media_body=mbody).execute()
   pprint.pprint(fileobj)
+  if create:
+    id = fileobj['id']
+  return id
 
 def script_download(drive_service, basedir, folder, id):
   fileobj = drive_service.files().get(fileId=id).execute()
@@ -85,7 +88,7 @@ def script_download(drive_service, basedir, folder, id):
   manifest_path = os.path.join(foldername, MANIFEST)
   logger.info('- manifest: %s' % MANIFEST)
   mfile = open(manifest_path, 'wb')
-  mfile.write(content)
+  mfile.write(content) # raw string
   mfile.close()
   # export files in the directory
   for i, fileInProject in enumerate(data['files']):
@@ -94,14 +97,23 @@ def script_download(drive_service, basedir, folder, id):
     filename = '%s%s' % (fileInProject['name'], extension)
     logger.info('- file%04d: %s' % (i, filename))
     f = open(os.path.join(foldername, filename), 'wb')
-    f.write(fileInProject['source'])
+    f.write(fileInProject['source'].encode('utf-8')) # from unicode json string
     f.close()
+  return id
 
 def main(basedir):
   ci = googleDriveAccess.readClientId(basedir)
   drive_service = googleDriveAccess.second_authorize(basedir, ci, script=True)
-  #script_upload(drive_service, basedir, SCRIPT_FOLDER, SCRIPT_ID, SCRIPT_NAME)
-  script_download(drive_service, basedir, SCRIPT_FOLDER, SCRIPT_ID)
+  mode = 0 # 0: create, 1: upload, 2: download
+  if mode == 0:
+    id = script_upload(drive_service, basedir, SCRIPT_FOLDER,
+      None, SCRIPT_NAME, create=True)
+  elif mode == 1:
+    id = script_upload(drive_service, basedir, SCRIPT_FOLDER,
+      SCRIPT_ID, SCRIPT_NAME, create=False)
+  else:
+    id = script_download(drive_service, basedir, SCRIPT_FOLDER, SCRIPT_ID)
+  print 'ID=%s' % id
 
 if __name__ == '__main__':
   logging.getLogger().setLevel(getattr(logging, 'INFO')) # ERROR
