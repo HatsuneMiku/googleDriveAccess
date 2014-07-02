@@ -14,9 +14,12 @@ from StringIO import StringIO
 
 import httplib2
 from apiclient.discovery import build
+from apiclient.http import MediaFileUpload
 from oauth2client.client import OAuth2WebServerFlow, OAuth2Credentials
 from oauth2client.anyjson import simplejson
 # import simplejson
+
+import logging
 
 OAUTH_SCOPE = [
   'https://www.googleapis.com/auth/drive',
@@ -25,6 +28,9 @@ OAUTH_SCOPE = [
 CICACHE_FILE = 'cicache.txt'
 CLIENT_FILE = 'client_secret_%s.json.enc'
 CREDENTIAL_FILE = 'credentials_%s.json.enc'
+
+MANIFEST = 'manifest.json'
+SCRIPT_TYPE = 'application/vnd.google-apps.script+json'
 
 def readClientId(basedir):
   f = open(os.path.join(basedir, CICACHE_FILE), 'rb')
@@ -152,3 +158,72 @@ def second_authorize(basedir, clientId, script=False):
   http = credentials.authorize(httplib2.Http())
   drive_service = build('drive', 'v2', http=http)
   return drive_service
+
+def script_upload(drive_service, folder, id, name, create=False):
+  logger = logging.getLogger()
+  foldername = os.path.join(folder, name)
+  logger.info('prepare folder: %s' % foldername)
+  manifest_path = os.path.join(foldername, MANIFEST)
+  mfile = open(manifest_path, 'rb')
+  data = simplejson.loads(mfile.read())
+  mfile.close()
+  # import files in the directory
+  for i, fileInProject in enumerate(data['files']):
+    extension = '.html' # default
+    if fileInProject['type'] == 'server_js': extension = '.gs'
+    filename = '%s%s' % (fileInProject['name'], extension)
+    logger.info('- file%04d: %s' % (i, filename))
+    f = open(os.path.join(foldername, filename), 'rb')
+    fileInProject['source'] = f.read().decode('utf-8') # to unicode json string
+    f.close()
+  # last import manifest.json
+  logger.info('- manifest: %s' % MANIFEST)
+  mfile = open(manifest_path, 'wb')
+  mfile.write(simplejson.dumps(data))
+  mfile.close()
+
+  mbody = MediaFileUpload(manifest_path, mimetype=SCRIPT_TYPE, resumable=True)
+  if create: # create new Apps Script project
+    body = {'title': name, 'mimeType': SCRIPT_TYPE, 'description': name}
+    fileobj = drive_service.files().insert(
+      body=body, media_body=mbody).execute()
+    id = fileobj['id']
+  else: # overwrite exists Apps Script project
+    body = {'mimeType': SCRIPT_TYPE}
+    fileobj = drive_service.files().update(
+      fileId=id, body=body, media_body=mbody).execute()
+  return (id, fileobj)
+
+def script_download(drive_service, folder, id):
+  logger = logging.getLogger()
+  fileobj = drive_service.files().get(fileId=id).execute()
+  download_url = fileobj['exportLinks'][SCRIPT_TYPE]
+  resp, content = drive_service._http.request(download_url)
+  if resp.status != 200: raise Exception('An error occurred: %s' % resp)
+  data = simplejson.loads(content)
+  foldername = os.path.join(folder, fileobj['title'])
+  logger.info('prepare folder: %s' % foldername)
+  if not os.path.exists(foldername): os.makedirs(foldername)
+  # Delete any files in the directory
+  for the_file in os.listdir(foldername):
+    file_path = os.path.join(foldername, the_file)
+    try:
+      if os.path.isfile(file_path): os.unlink(file_path)
+    except (Exception, ), e:
+      print e
+  # first export manifest.json
+  manifest_path = os.path.join(foldername, MANIFEST)
+  logger.info('- manifest: %s' % MANIFEST)
+  mfile = open(manifest_path, 'wb')
+  mfile.write(content) # raw string
+  mfile.close()
+  # export files in the directory
+  for i, fileInProject in enumerate(data['files']):
+    extension = '.html' # default
+    if fileInProject['type'] == 'server_js': extension = '.gs'
+    filename = '%s%s' % (fileInProject['name'], extension)
+    logger.info('- file%04d: %s' % (i, filename))
+    f = open(os.path.join(foldername, filename), 'wb')
+    f.write(fileInProject['source'].encode('utf-8')) # from unicode json string
+    f.close()
+  return (id, None)
