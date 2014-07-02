@@ -125,105 +125,143 @@ def getpass2():
     print 'both passwords are not same'
   return pid
 
-def first_authorize(basedir, clientId, script):
-  print 'client secret open. CI=%s' % clientId
-  pid = getpass.getpass()
-  d = readJsonClient(basedir, pid, clientId)
-  cli = simplejson.loads(d)['installed']
-  # print cli
-  scope = OAUTH_SCOPE[0] if not script else ' '.join(OAUTH_SCOPE)
-  flow = OAuth2WebServerFlow(cli['client_id'], cli['client_secret'],
-    scope, redirect_uri=cli['redirect_uris'][0])
-  authorize_url = flow.step1_get_authorize_url()
-  print 'Go to the following link in your browser: %s' % authorize_url
-  code = raw_input('Enter verification code: ').strip()
-  credentials = flow.step2_exchange(code)
-  print 'OAuth2 success. store credential. CI=%s' % clientId
-  pid = getpass2()
-  store_credentials(basedir, pid, clientId, credentials)
-  return credentials
+class DAClient(object):
+  def __init__(self, basedir, clientId=None, script=False, firstonly=False):
+    self.basedir = basedir
+    self.clientId = clientId
+    self.script = script
+    self.pfields = ['modifiedDate', 'title', 'id', 'mimeType']
+    self.drive_service = None
+    if self.clientId is None:
+      self.clientId = readClientId(self.basedir)
+    if not firstonly:
+      if self.second_authorize() is None:
+        return None
 
-def second_authorize(basedir, clientId, script=False):
-  # OAuth2 and save / load credentials
-  try:
-    print 'OAuth2 credential open. CI=%s' % clientId
+  def first_authorize(self):
+    print 'client secret open. CI=%s' % self.clientId
     pid = getpass.getpass()
-    credentials = get_stored_credentials(basedir, pid, clientId)
-    if credentials is None or credentials.invalid:
-      credentials = first_authorize(basedir, clientId, script)
-  except (Exception, ), e:
-    credentials = first_authorize(basedir, clientId, script)
+    d = readJsonClient(self.basedir, pid, self.clientId)
+    cli = simplejson.loads(d)['installed']
+    # print cli
+    scope = OAUTH_SCOPE[0] if not self.script else ' '.join(OAUTH_SCOPE)
+    flow = OAuth2WebServerFlow(cli['client_id'], cli['client_secret'],
+      scope, redirect_uri=cli['redirect_uris'][0])
+    authorize_url = flow.step1_get_authorize_url()
+    print 'Go to the following link in your browser: %s' % authorize_url
+    code = raw_input('Enter verification code: ').strip()
+    credentials = flow.step2_exchange(code)
+    print 'OAuth2 success. store credential. CI=%s' % self.clientId
+    pid = getpass2()
+    store_credentials(self.basedir, pid, self.clientId, credentials)
+    return credentials
 
-  # Connect to Google Drive
-  http = credentials.authorize(httplib2.Http())
-  drive_service = build('drive', 'v2', http=http)
-  return drive_service
-
-def script_upload(drive_service, folder, id, name, create=False):
-  logger = logging.getLogger()
-  foldername = os.path.join(folder, name)
-  logger.info('prepare folder: %s' % foldername)
-  manifest_path = os.path.join(foldername, MANIFEST)
-  mfile = open(manifest_path, 'rb')
-  data = simplejson.loads(mfile.read())
-  mfile.close()
-  # import files in the directory
-  for i, fileInProject in enumerate(data['files']):
-    extension = '.html' # default
-    if fileInProject['type'] == 'server_js': extension = '.gs'
-    filename = '%s%s' % (fileInProject['name'], extension)
-    logger.info('- file%04d: %s' % (i, filename))
-    f = open(os.path.join(foldername, filename), 'rb')
-    fileInProject['source'] = f.read().decode('utf-8') # to unicode json string
-    f.close()
-  # last import manifest.json
-  logger.info('- manifest: %s' % MANIFEST)
-  mfile = open(manifest_path, 'wb')
-  mfile.write(simplejson.dumps(data))
-  mfile.close()
-
-  mbody = MediaFileUpload(manifest_path, mimetype=SCRIPT_TYPE, resumable=True)
-  if create: # create new Apps Script project
-    body = {'title': name, 'mimeType': SCRIPT_TYPE, 'description': name}
-    fileobj = drive_service.files().insert(
-      body=body, media_body=mbody).execute()
-    id = fileobj['id']
-  else: # overwrite exists Apps Script project
-    body = {'mimeType': SCRIPT_TYPE}
-    fileobj = drive_service.files().update(
-      fileId=id, body=body, media_body=mbody).execute()
-  return (id, fileobj)
-
-def script_download(drive_service, folder, id):
-  logger = logging.getLogger()
-  fileobj = drive_service.files().get(fileId=id).execute()
-  download_url = fileobj['exportLinks'][SCRIPT_TYPE]
-  resp, content = drive_service._http.request(download_url)
-  if resp.status != 200: raise Exception('An error occurred: %s' % resp)
-  data = simplejson.loads(content)
-  foldername = os.path.join(folder, fileobj['title'])
-  logger.info('prepare folder: %s' % foldername)
-  if not os.path.exists(foldername): os.makedirs(foldername)
-  # Delete any files in the directory
-  for the_file in os.listdir(foldername):
-    file_path = os.path.join(foldername, the_file)
+  def second_authorize(self):
+    # OAuth2 and save / load credentials
     try:
-      if os.path.isfile(file_path): os.unlink(file_path)
+      print 'OAuth2 credential open. CI=%s' % self.clientId
+      pid = getpass.getpass()
+      credentials = get_stored_credentials(self.basedir, pid, self.clientId)
+      if credentials is None or credentials.invalid:
+        credentials = self.first_authorize()
     except (Exception, ), e:
-      print e
-  # first export manifest.json
-  manifest_path = os.path.join(foldername, MANIFEST)
-  logger.info('- manifest: %s' % MANIFEST)
-  mfile = open(manifest_path, 'wb')
-  mfile.write(content) # raw string
-  mfile.close()
-  # export files in the directory
-  for i, fileInProject in enumerate(data['files']):
-    extension = '.html' # default
-    if fileInProject['type'] == 'server_js': extension = '.gs'
-    filename = '%s%s' % (fileInProject['name'], extension)
-    logger.info('- file%04d: %s' % (i, filename))
-    f = open(os.path.join(foldername, filename), 'wb')
-    f.write(fileInProject['source'].encode('utf-8')) # from unicode json string
-    f.close()
-  return (id, None)
+      credentials = self.first_authorize()
+    if credentials is None:
+      return None
+    # Connect to Google Drive
+    http = credentials.authorize(httplib2.Http())
+    self.drive_service = build('drive', 'v2', http=http)
+    if self.drive_service is None:
+      return None
+    return self.drive_service
+
+  def execQuery(self, q, noprint=False):
+    e = self.drive_service.files().list(q=q).execute()
+    if not noprint:
+      for f in e['items']:
+        for fld in self.pfields:
+          print f[fld],
+        print
+    return e
+
+class DAScript(DAClient):
+  def __init__(self, basedir, folder, clientId=None):
+    super(DAScript, self).__init__(basedir, clientId, script=True)
+    self.folder = folder
+
+  def upload(self, id, name, create=False):
+    logger = logging.getLogger()
+    foldername = os.path.join(self.folder, name)
+    logger.info('prepare folder: %s' % foldername)
+    manifest_path = os.path.join(foldername, MANIFEST)
+    mfile = open(manifest_path, 'rb')
+    data = simplejson.loads(mfile.read())
+    mfile.close()
+    # import files in the directory
+    for i, fileInProject in enumerate(data['files']):
+      extension = '.html' # default
+      if fileInProject['type'] == 'server_js': extension = '.gs'
+      filename = '%s%s' % (fileInProject['name'], extension)
+      logger.info('- file%04d: %s' % (i, filename))
+      f = open(os.path.join(foldername, filename), 'rb')
+      fileInProject['source'] = f.read().decode('utf-8') # to unicode json
+      f.close()
+    # last import manifest.json
+    logger.info('- manifest: %s' % MANIFEST)
+    mfile = open(manifest_path, 'wb')
+    mfile.write(simplejson.dumps(data))
+    mfile.close()
+
+    mbody = MediaFileUpload(manifest_path, mimetype=SCRIPT_TYPE, resumable=True)
+    if create: # create new Apps Script project
+      body = {'title': name, 'mimeType': SCRIPT_TYPE, 'description': name}
+      fileobj = self.drive_service.files().insert(
+        body=body, media_body=mbody).execute()
+      id = fileobj['id']
+      # export manifest.json to refresh new file id
+      download_url = fileobj['exportLinks'][SCRIPT_TYPE]
+      resp, content = self.drive_service._http.request(download_url)
+      if resp.status != 200: raise Exception('An error occurred: %s' % resp)
+      logger.info('- refresh: %s' % MANIFEST)
+      mfile = open(manifest_path, 'wb')
+      mfile.write(content) # raw string
+      mfile.close()
+    else: # overwrite exists Apps Script project
+      body = {'mimeType': SCRIPT_TYPE}
+      fileobj = self.drive_service.files().update(
+        fileId=id, body=body, media_body=mbody).execute()
+    return (id, fileobj)
+
+  def download(self, id):
+    logger = logging.getLogger()
+    fileobj = self.drive_service.files().get(fileId=id).execute()
+    download_url = fileobj['exportLinks'][SCRIPT_TYPE]
+    resp, content = self.drive_service._http.request(download_url)
+    if resp.status != 200: raise Exception('An error occurred: %s' % resp)
+    data = simplejson.loads(content)
+    foldername = os.path.join(self.folder, fileobj['title'])
+    logger.info('prepare folder: %s' % foldername)
+    if not os.path.exists(foldername): os.makedirs(foldername)
+    # Delete any files in the directory
+    for the_file in os.listdir(foldername):
+      file_path = os.path.join(foldername, the_file)
+      try:
+        if os.path.isfile(file_path): os.unlink(file_path)
+      except (Exception, ), e:
+        print e
+    # first export manifest.json
+    manifest_path = os.path.join(foldername, MANIFEST)
+    logger.info('- manifest: %s' % MANIFEST)
+    mfile = open(manifest_path, 'wb')
+    mfile.write(content) # raw string
+    mfile.close()
+    # export files in the directory
+    for i, fileInProject in enumerate(data['files']):
+      extension = '.html' # default
+      if fileInProject['type'] == 'server_js': extension = '.gs'
+      filename = '%s%s' % (fileInProject['name'], extension)
+      logger.info('- file%04d: %s' % (i, filename))
+      f = open(os.path.join(foldername, filename), 'wb')
+      f.write(fileInProject['source'].encode('utf-8')) # from unicode json
+      f.close()
+    return (id, None)

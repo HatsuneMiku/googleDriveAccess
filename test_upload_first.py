@@ -15,8 +15,8 @@ import logging
 logging.basicConfig()
 
 def main(basedir):
-  ci = googleDriveAccess.readClientId(basedir)
-  credentials = googleDriveAccess.first_authorize(basedir, ci, script=True)
+  da = googleDriveAccess.DAClient(basedir, script=True, firstonly=True)
+  da.first_authorize()
 
 if __name__ == '__main__':
   logging.getLogger().setLevel(getattr(logging, 'INFO')) # ERROR

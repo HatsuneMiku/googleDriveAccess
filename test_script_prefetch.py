@@ -26,33 +26,27 @@ SCRIPT_TYPE = 'application/vnd.google-apps.script+json'
 
 logging.getLogger().setLevel(getattr(logging, 'INFO'))
 basedir = os.path.abspath('.')
-ci = googleDriveAccess.readClientId(basedir)
-ds = googleDriveAccess.second_authorize(basedir, ci, script=True)
+da = googleDriveAccess.DAClient(basedir, script=True) # clientId=None
 
-def execQuery(q):
-  items = ds.files().list(q=q).execute()['items']
-  for f in items:
-    print f['modifiedDate'], f['title'], f['id'], f['mimeType']
+da.execQuery("title contains 'test'")
+da.execQuery("fullText contains 'test'")
+da.execQuery("'root' in parents") # files and folders in root
+da.execQuery("'root' in parents and fullText contains 'test'") # only in root
+da.execQuery("not 'root' in parents and fullText contains 'test'") # in not root
+da.execQuery("sharedWithMe")
+# da.execQuery("'YOURACCOUNT@gmail.com' in writers")
+# da.execQuery("'YOURACCOUNT@gmail.com' in owners")
+da.execQuery("'root' in parents and modifiedDate > '2014-06-30T23:59:59'")
+da.execQuery("modifiedDate >= '2014-06-30T00:00:00' and modifiedDate < '2014-07-02T00:00:00'")
+# da.execQuery("'test_folder' in parents") # File not found:
+# da.execQuery("'YOUR_FOLDER_ID' in parents") # OK /test_folder
+# da.execQuery("'root/subfolder' in parents") # File not found:
+# da.execQuery("'subfolder' in parents") # File not found:
+# da.execQuery("'subfolder' in 'root'") # Invalid Value
+# da.execQuery("'YOUR_SUBFOLDER_ID' in parents") # OK /subfolder
+# da.execQuery("'YOUR_SUB_SUBFOLDER_ID' in parents") # OK /subfolder/sub_subfolder
 
-execQuery("title contains 'test'")
-execQuery("fullText contains 'test'")
-execQuery("'root' in parents") # files and folders in root
-execQuery("'root' in parents and fullText contains 'test'") # only in root
-execQuery("not 'root' in parents and fullText contains 'test'") # only not root
-execQuery("sharedWithMe")
-# execQuery("'YOURACCOUNT@gmail.com' in writers")
-# execQuery("'YOURACCOUNT@gmail.com' in owners")
-execQuery("'root' in parents and modifiedDate > '2014-06-30T23:59:59'")
-execQuery("modifiedDate >= '2014-06-30T00:00:00' and modifiedDate < '2014-07-02T00:00:00'")
-# execQuery("'test_folder' in parents") # File not found:
-# execQuery("'YOUR_FOLDER_ID' in parents") # OK /test_folder
-# execQuery("'root/subfolder' in parents") # File not found:
-# execQuery("'subfolder' in parents") # File not found:
-# execQuery("'subfolder' in 'root'") # Invalid Value
-# execQuery("'YOUR_SUBFOLDER_ID' in parents") # OK /subfolder
-# execQuery("'YOUR_SUB_SUBFOLDER_ID' in parents") # OK /subfolder/sub_subfolder
-
-e = ds.files().list(q="mimeType='%s'" % SCRIPT_TYPE[:-5]).execute()
+e = da.execQuery("mimeType='%s'" % SCRIPT_TYPE[:-5])
 
 # pprint.pprint(e)
 # pprint.pprint(e['items'])
@@ -65,7 +59,7 @@ e = ds.files().list(q="mimeType='%s'" % SCRIPT_TYPE[:-5]).execute()
 # pprint.pprint(e['items'][0]['mimeType']) # application/vnd.google-apps.script
 
 download_url = e['items'][0]['exportLinks'][SCRIPT_TYPE]
-resp, content = ds._http.request(download_url)
+resp, content = da.drive_service._http.request(download_url)
 if resp.status != 200: raise Exception('An error occurred: %s' % resp)
 data = simplejson.loads(content)
 

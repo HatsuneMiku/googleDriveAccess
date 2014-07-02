@@ -28,21 +28,14 @@ SCRIPT_ID = 'SCRIPT_ID_YOU_WISH_TO_HANDLE'
 SCRIPT_NAME = 'test_GoogleAppsScript_createCalendarEvent'
 
 def main(basedir):
-  ci = googleDriveAccess.readClientId(basedir)
-  drive_service = googleDriveAccess.second_authorize(basedir, ci, script=True)
   folder = os.path.join(basedir, SCRIPT_FOLDER)
+  das = googleDriveAccess.DAScript(basedir, folder) # clientId=None
   mode = 0 # 0: create, 1: upload, 2: download
-  if mode == 0:
-    id, fileobj = googleDriveAccess.script_upload(drive_service, folder,
-      None, SCRIPT_NAME, create=True)
-  elif mode == 1:
-    id, fileobj = googleDriveAccess.script_upload(drive_service, folder,
-      SCRIPT_ID, SCRIPT_NAME, create=False)
-  else:
-    id, fileobj = googleDriveAccess.script_download(drive_service, folder,
-      SCRIPT_ID)
+  if mode == 0: id, fileobj = das.upload(None, SCRIPT_NAME, create=True)
+  elif mode == 1: id, fileobj = das.upload(SCRIPT_ID, SCRIPT_NAME)
+  else: id, fileobj = das.download(SCRIPT_ID)
   pprint.pprint(fileobj)
-  print 'ID=%s' % id
+  print 'SCRIPT_ID=%s' % id
 
 if __name__ == '__main__':
   logging.getLogger().setLevel(getattr(logging, 'INFO')) # ERROR

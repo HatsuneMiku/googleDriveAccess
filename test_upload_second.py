@@ -19,8 +19,8 @@ logging.basicConfig()
 FILENAME = 'test_document.txt'
 
 def upload_file(basedir, filename, mimetype, description):
-  ci = googleDriveAccess.readClientId(basedir)
-  drive_service = googleDriveAccess.second_authorize(basedir, ci)
+  da = googleDriveAccess.DAClient(basedir, script=True) # clientId=None
+  drive_service = da.drive_service
 
   # Upload a file
   body = {'title': filename, 'mimeType': mimetype, 'description': description}
