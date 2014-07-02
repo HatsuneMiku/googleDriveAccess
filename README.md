@@ -20,8 +20,6 @@ How to use it
 
 - execute ./test_upload_second.py to test OAuth2 using stored credentials
 
-- execute ./test_upload_new.py to test automated scripts avobe ( first and second )
-
 - execute ./test_script_prefetch.py to test Drive API search with query
 
 - create directory './script_import_export' for tests below
