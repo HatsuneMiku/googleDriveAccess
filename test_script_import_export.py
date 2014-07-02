@@ -54,18 +54,17 @@ def script_upload(drive_service, basedir, folder, id, name, create=False):
   mfile.write(simplejson.dumps(data))
   mfile.close()
 
-  # body = {'title': name, 'mimeType': SCRIPT_TYPE, 'description': name}
-  body = {'mimeType': SCRIPT_TYPE}
   mbody = MediaFileUpload(manifest_path, mimetype=SCRIPT_TYPE, resumable=True)
   if create: # create new Apps Script project
+    body = {'title': name, 'mimeType': SCRIPT_TYPE, 'description': name}
     fileobj = drive_service.files().insert(
       body=body, media_body=mbody).execute()
+    id = fileobj['id']
   else: # overwrite exists Apps Script project
+    body = {'mimeType': SCRIPT_TYPE}
     fileobj = drive_service.files().update(
       fileId=id, body=body, media_body=mbody).execute()
   pprint.pprint(fileobj)
-  if create:
-    id = fileobj['id']
   return id
 
 def script_download(drive_service, basedir, folder, id):
