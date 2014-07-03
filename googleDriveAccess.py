@@ -186,7 +186,7 @@ class DAClient(object):
       e = self.drive_service.files().list(q=q, **kwargs).execute()
       if result is None: result = e
       else: result['items'] += e['items']
-      # e does not have 'nextPageToken' key when len(e['items']) < maxResults
+      # e does not have 'nextPageToken' key when len(e['items']) <= maxResults
       npt = e.get('nextPageToken')
       if not noprint:
         for f in e['items']:
