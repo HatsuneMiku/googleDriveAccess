@@ -175,14 +175,27 @@ class DAClient(object):
       return None
     return self.drive_service
 
-  def execQuery(self, q, noprint=False):
-    e = self.drive_service.files().list(q=q).execute()
-    if not noprint:
-      for f in e['items']:
-        for fld in self.pfields:
-          print f[fld],
-        print
-    return e
+  def execQuery(self, q, repeattoken=False, noprint=False, **kwargs):
+    '''
+    kwargs = {'maxResults': 10} # default maxResults=100
+    '''
+    result = None
+    npt = ''
+    while not npt is None:
+      if npt != '': kwargs['pageToken'] = npt
+      e = self.drive_service.files().list(q=q, **kwargs).execute()
+      if result is None: result = e
+      else: result['items'] += e['items']
+      # e does not have 'nextPageToken' key when len(e['items']) < maxResults
+      npt = e.get('nextPageToken')
+      if not noprint:
+        for f in e['items']:
+          for fld in self.pfields:
+            print f[fld],
+          print
+        print 'len: %d, nextPageToken: %s' % (len(e['items']), npt)
+      if not repeattoken: break
+    return result
 
 class DAScript(DAClient):
   def __init__(self, basedir, folder, clientId=None):

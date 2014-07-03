@@ -28,6 +28,15 @@ logging.getLogger().setLevel(getattr(logging, 'INFO'))
 basedir = os.path.abspath('.')
 da = googleDriveAccess.DAClient(basedir, script=True) # clientId=None
 
+q = "'root' in parents"
+e = da.execQuery(q, noprint=True) # default maxResults=100
+print 'length: %d [%s]' % (len(e['items']), q)
+# test with pageToken/nextPageToken
+e = da.execQuery(q, repeattoken=True, noprint=False, **{'maxResults': 10})
+print 'length: %d [%s]' % (len(e['items']), q)
+e = da.execQuery(q, **{'maxResults': 3}) # repeattoken=False, noprint=False
+print 'length: %d [%s]' % (len(e['items']), q)
+
 da.execQuery("title contains 'test'")
 da.execQuery("fullText contains 'test'")
 da.execQuery("'root' in parents") # files and folders in root
