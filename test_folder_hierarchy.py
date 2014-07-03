@@ -29,23 +29,24 @@ def uenc(u):
   if isinstance(u, unicode): return u.encode('utf-8')
   else: return u
 
-def walk(ds, folderId, folderName, outf, depth):
-  spc = ' ' * depth
-  outf.write('%s+%s\n%s  %s\n' % (spc, uenc(folderId), spc, uenc(folderName)))
+def walk(ds, folderId, outf, depth):
+  spc = ' ' * (len(depth) - 1)
+  outf.write('%s+%s\n%s %s\n' % (
+    spc, uenc(folderId), spc, '/'.join(depth + ('', ))))
   q = "'%s' in parents and mimeType='%s'" % (folderId, FOLDER_TYPE)
   entries = getlist(ds, q, **{'maxResults': 200})
   for folder in entries['items']:
-    walk(ds, folder['id'], folder['title'], outf, depth + 1)
+    walk(ds, folder['id'], outf, depth + (folder['title'], ))
   q = "'%s' in parents and mimeType!='%s'" % (folderId, FOLDER_TYPE)
   entries = getlist(ds, q, **{'maxResults': 200})
   for f in entries['items']:
-    outf.write('%s -%s %s\n%s   %s\n' % (
+    outf.write('%s -%s %s\n%s  %s\n' % (
       spc, uenc(f['id']), uenc(f['mimeType']), spc, uenc(f['title'])))
 
 def main(basedir):
   da = googleDriveAccess.DAClient(basedir) # clientId=None, script=False
   f = open(os.path.join(basedir, 'hierarchy.txt'), 'wb')
-  walk(da.drive_service, 'root', u'root', f, 0)
+  walk(da.drive_service, 'root', f, ('', ))
   f.close()
 
 if __name__ == '__main__':
