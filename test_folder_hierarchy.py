@@ -39,7 +39,8 @@ def walk(ds, folderId, folderName, outf, depth):
   q = "'%s' in parents and mimeType!='%s'" % (folderId, FOLDER_TYPE)
   entries = getlist(ds, q, **{'maxResults': 200})
   for f in entries['items']:
-    outf.write('%s -%s\n%s   %s\n' % (spc, uenc(f['id']), spc, uenc(f['title'])))
+    outf.write('%s -%s %s\n%s   %s\n' % (
+      spc, uenc(f['id']), uenc(f['mimeType']), spc, uenc(f['title'])))
 
 def main(basedir):
   da = googleDriveAccess.DAClient(basedir) # clientId=None, script=False
