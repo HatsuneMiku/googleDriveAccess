@@ -14,47 +14,36 @@ logging.basicConfig()
 
 FOLDER_TYPE = 'application/vnd.google-apps.folder'
 
-def getlist(ds, q, **kwargs):
-  result = None
-  npt = ''
-  while not npt is None:
-    if npt != '': kwargs['pageToken'] = npt
-    entries = ds.files().list(q=q, **kwargs).execute()
-    if result is None: result = entries
-    else: result['items'] += entries['items']
-    npt = entries.get('nextPageToken')
-  return result
-
 def uenc(u):
   if isinstance(u, unicode): return u.encode('utf-8')
   else: return u
 
-def walk(ds, folderId, outf, depth, topdown=True):
+def walk(da, folderId, outf, depth, topdown=True):
   spc = ' ' * (len(depth) - 1)
   outf.write('%s+%s\n%s %s\n' % (
     spc, uenc(folderId), spc, '/'.join(depth + ('', ))))
 
-  def outfiles(ds, folderId, outf, spc):
+  def outfiles(da, folderId, outf, spc):
     q = "'%s' in parents and mimeType!='%s'" % (folderId, FOLDER_TYPE)
-    entries = getlist(ds, q, **{'maxResults': 200})
+    entries = da.execQuery(q, True, True, **{'maxResults': 200})
     for f in entries['items']:
       outf.write('%s -%s %s\n%s  %s\n' % (
         spc, uenc(f['id']), uenc(f['mimeType']), spc, uenc(f['title'])))
 
-  if topdown: outfiles(ds, folderId, outf, spc)
+  if topdown: outfiles(da, folderId, outf, spc)
   q = "'%s' in parents and mimeType='%s'" % (folderId, FOLDER_TYPE)
-  entries = getlist(ds, q, **{'maxResults': 200})
+  entries = da.execQuery(q, True, True, **{'maxResults': 200})
   for folder in entries['items']:
-    walk(ds, folder['id'], outf, depth + (folder['title'], ))
-  if not topdown: outfiles(ds, folderId, outf, spc)
+    walk(da, folder['id'], outf, depth + (folder['title'], ))
+  if not topdown: outfiles(da, folderId, outf, spc)
 
 def main(basedir):
   da = googleDriveAccess.DAClient(basedir) # clientId=None, script=False
   f = open(os.path.join(basedir, 'hierarchy_topdown.txt'), 'wb')
-  walk(da.drive_service, 'root', f, ('', ))
+  walk(da, 'root', f, ('', ))
   f.close()
   f = open(os.path.join(basedir, 'hierarchy_bottomup.txt'), 'wb')
-  walk(da.drive_service, 'root', f, ('', ), topdown=False)
+  walk(da, 'root', f, ('', ), topdown=False)
   f.close()
 
 if __name__ == '__main__':

@@ -130,7 +130,8 @@ class DAClient(object):
     self.basedir = basedir
     self.clientId = clientId
     self.script = script
-    self.pfields = ['modifiedDate', 'title', 'id', 'mimeType']
+    self.printFields = ['modifiedDate', 'title', 'id', 'mimeType']
+    self.printCallback = self.defaultPrintCallback
     self.drive_service = None
     if self.clientId is None:
       self.clientId = readClientId(self.basedir)
@@ -175,6 +176,19 @@ class DAClient(object):
       return None
     return self.drive_service
 
+  def setPrintFields(self, pfields):
+    self.printFields = pfields
+
+  def setPrintCallback(self, pcallback):
+    self.printCallback = pcallback
+
+  def defaultPrintCallback(self, e):
+    for f in e['items']:
+      for fld in self.printFields:
+        print f[fld],
+      print
+    print 'len: %d, hasNext: %s' % (len(e['items']), 'nextPageToken' in e)
+
   def execQuery(self, q, repeattoken=False, noprint=False, **kwargs):
     '''
     kwargs = {'maxResults': 10} # default maxResults=100
@@ -188,12 +202,7 @@ class DAClient(object):
       else: result['items'] += e['items']
       # e does not have 'nextPageToken' key when len(e['items']) <= maxResults
       npt = e.get('nextPageToken')
-      if not noprint:
-        for f in e['items']:
-          for fld in self.pfields:
-            print f[fld],
-          print
-        print 'len: %d, nextPageToken: %s' % (len(e['items']), npt)
+      if not noprint and not self.printCallback is None: self.printCallback(e)
       if not repeattoken: break
     return result
 
