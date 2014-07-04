@@ -31,6 +31,7 @@ CREDENTIAL_FILE = 'credentials_%s.json.enc'
 
 MANIFEST = 'manifest.json'
 SCRIPT_TYPE = 'application/vnd.google-apps.script+json'
+FOLDER_TYPE = 'application/vnd.google-apps.folder'
 
 def readClientId(basedir):
   f = open(os.path.join(basedir, CICACHE_FILE), 'rb')
@@ -205,6 +206,32 @@ class DAClient(object):
       if not noprint and not self.printCallback is None: self.printCallback(e)
       if not repeattoken: break
     return result
+
+  def walk_iter(self, folderId, topdown=True, q=None, **kwargs):
+    def procentry(mode, folderId, q, **kwargs):
+      result = []
+      c = '=' if mode else '!='
+      query = "'%s' in parents and mimeType%s'%s'" % (folderId, c, FOLDER_TYPE)
+      entries = self.execQuery(query, True, True, **kwargs)
+      for entry in entries['items']:
+        result += [map(lambda a: entry[a], self.printFields)]
+      return result
+
+    def procfolders(epaths, folders):
+      for folder in folders:
+        id = folder[2]
+        edirs = procentry(True, id, q, **kwargs)
+        efiles = procentry(False, id, q, **kwargs)
+        nepaths = epaths + [folder]
+        if topdown: yield nepaths, edirs, efiles
+        for ep, ed, ef in procfolders(nepaths, edirs):
+          yield ep, ed, ef
+        if not topdown: yield nepaths, edirs, efiles
+
+    epaths = []
+    folders = [('0000-00-00T00:00:00.000Z', '', folderId, None)]
+    for ep, ed, ef in procfolders(epaths, folders):
+      yield ep, ed, ef
 
 class DAScript(DAClient):
   def __init__(self, basedir, folder, clientId=None):
