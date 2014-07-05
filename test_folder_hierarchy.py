@@ -18,29 +18,34 @@ def uenc(u):
   if isinstance(u, unicode): return u.encode('utf-8')
   else: return u
 
+def fullpath(epaths):
+  return '/'.join(map(lambda a: uenc(a[1]), epaths))
+
 def walk(da, folderId, outf, depth, topdown=True):
   spc = ' ' * (len(depth) - 1)
+  joineddepth = '/'.join(depth + ('', ))
   outf.write('%s+%s\n%s %s\n' % (
-    spc, uenc(folderId), spc, '/'.join(depth + ('', ))))
+    spc, uenc(folderId), spc, joineddepth))
 
-  def outfiles(da, folderId, outf, spc):
+  def outfiles(da, folderId, outf, spc, joineddepth):
     q = "'%s' in parents and mimeType!='%s'" % (folderId, FOLDER_TYPE)
     entries = da.execQuery(q, True, True, **{'maxResults': 200})
     for f in entries['items']:
-      outf.write('%s -%s %s\n%s  %s\n' % (
-        spc, uenc(f['id']), uenc(f['mimeType']), spc, uenc(f['title'])))
+      outf.write('%s -%s %s\n%s  %s%s\n' % (
+        spc, uenc(f['id']), uenc(f['mimeType']),
+        spc, uenc(joineddepth), uenc(f['title'])))
 
-  if topdown: outfiles(da, folderId, outf, spc)
+  if topdown: outfiles(da, folderId, outf, spc, joineddepth)
   q = "'%s' in parents and mimeType='%s'" % (folderId, FOLDER_TYPE)
   entries = da.execQuery(q, True, True, **{'maxResults': 200})
   for folder in entries['items']:
     walk(da, folder['id'], outf, depth + (folder['title'], ))
-  if not topdown: outfiles(da, folderId, outf, spc)
+  if not topdown: outfiles(da, folderId, outf, spc, joineddepth)
 
 def visitCallback(arg, epaths, edirs, efiles=None):
   outf = arg[0]
   spc = ' ' * (len(epaths) - 1)
-  joinedepaths = '/'.join(map(lambda a: uenc(a[1]), epaths))
+  joinedepaths = fullpath(epaths)
   if efiles is None:
     outf.write('%s+%s\n%s %s/\n' % (
       spc, uenc(epaths[-1][2]), spc, joinedepaths))
@@ -51,7 +56,7 @@ def visitCallback(arg, epaths, edirs, efiles=None):
 
 def proc_iter(outf, epaths, edirs, efiles, topdown=True):
   spc = ' ' * len(epaths)
-  joinedepaths = '/'.join(map(lambda a: uenc(a[1]), epaths))
+  joinedepaths = fullpath(epaths)
 
   def outfiles(outf, efiles, spc, joinedepaths):
     for ef in efiles:
