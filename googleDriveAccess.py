@@ -248,6 +248,12 @@ class DAClient(object):
     for ep, ed, ef in procfolders(epaths, folders):
       yield ep, ed, ef
 
+  def createFolder(self, name, parentId='root'):
+    body = {'title': name, 'mimeType': FOLDER_TYPE, 'description': name}
+    body['parents'] = [{'id': parentId}]
+    folder = self.drive_service.files().insert(body=body).execute()
+    return (folder['id'], folder)
+
 class DAScript(DAClient):
   def __init__(self, basedir, folder, clientId=None):
     super(DAScript, self).__init__(basedir, clientId, script=True)
