@@ -92,6 +92,10 @@ key varchar(%d) primary key not null, val varchar(%d) unique not null);''' % (
     cn.close()
   da = googleDriveAccess.DAClient(basedir)
   recursive_upload(da, basedir, BACKUP, folderIds)
+  # test for bottomup directory creation
+  for subfolder in ['sub1/sub2', 'sub1/sub3', 'sub4']:
+    p_id, q = prepare_folder(da, folderIds, '/%s/testbottomup/%s' % (
+      BACKUP, subfolder))
 
 if __name__ == '__main__':
   logging.getLogger().setLevel(getattr(logging, 'INFO')) # ERROR
