@@ -58,6 +58,16 @@ def prepare_folder(da, folderIds, folder):
     folderId = row['key']
   return (folderId, q)
 
+def uploadFile(da, path, filename, parentId):
+  #body = {'title': filename, 'mimeType': mimetype, 'description': description}
+  body = {'title': filename, 'description': filename}
+  body['parents'] = [{'id': parentId}]
+  filepath = os.path.join(path, filename)
+  #mbody = MediaFileUpload(filepath, mimetype=mimetype, resumable=True)
+  mbody = MediaFileUpload(filepath, resumable=True)
+  fileObj = da.drive_service.files().insert(body=body, media_body=mbody).execute()
+  return (fileObj['id'], fileObj)
+
 def recursive_upload(da, basedir, backup, folderIds):
   b = os.path.join(basedir, backup)
   backup_id, q = prepare_folder(da, folderIds, b[len(basedir):]) # set [0]='/'
@@ -67,6 +77,7 @@ def recursive_upload(da, basedir, backup, folderIds):
       print 'D %s %s' % (q, d) # os.path.join(path, d)
     for f in files:
       print 'F %s %s' % (q, f) # os.path.join(path, f)
+      uploadFile(da, path, f, p_id)
 
 def main(basedir):
   folderIds = os.path.join(basedir, CACHE_FOLDERIDS)
