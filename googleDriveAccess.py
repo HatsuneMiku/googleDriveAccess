@@ -207,21 +207,36 @@ class DAClient(object):
       if not repeattoken: break
     return result
 
+  def procentry(self, mode, folderId, q, **kwargs):
+    result = []
+    c = '=' if mode else '!='
+    query = "'%s' in parents and mimeType%s'%s'" % (folderId, c, FOLDER_TYPE)
+    entries = self.execQuery(query, True, True, **kwargs)
+    for entry in entries['items']:
+      result += [map(lambda a: entry[a], self.printFields)]
+    return result
+
+  def walk_visit(self, folderId, visit, arg,
+    depth=[], topdown=True, q=None, **kwargs):
+    '''like os.path.walk()'''
+    edirs = self.procentry(True, folderId, q, **kwargs)
+    efiles = self.procentry(False, folderId, q, **kwargs)
+    if not len(depth):
+      depth = [('0000-00-00T00:00:00.000Z', '', folderId, None)]
+    visit(arg, depth, edirs)
+    if topdown: visit(arg, depth, edirs, efiles)
+    for ed in edirs:
+      self.walk_visit(ed[2], visit, arg, depth + [ed])
+    if not topdown: visit(arg, depth, edirs, efiles)
+
   def walk_iter(self, folderId, topdown=True, q=None, **kwargs):
-    def procentry(mode, folderId, q, **kwargs):
-      result = []
-      c = '=' if mode else '!='
-      query = "'%s' in parents and mimeType%s'%s'" % (folderId, c, FOLDER_TYPE)
-      entries = self.execQuery(query, True, True, **kwargs)
-      for entry in entries['items']:
-        result += [map(lambda a: entry[a], self.printFields)]
-      return result
+    '''like os.walk()'''
 
     def procfolders(epaths, folders):
       for folder in folders:
         id = folder[2]
-        edirs = procentry(True, id, q, **kwargs)
-        efiles = procentry(False, id, q, **kwargs)
+        edirs = self.procentry(True, id, q, **kwargs)
+        efiles = self.procentry(False, id, q, **kwargs)
         nepaths = epaths + [folder]
         if topdown: yield nepaths, edirs, efiles
         for ep, ed, ef in procfolders(nepaths, edirs):

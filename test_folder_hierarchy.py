@@ -37,6 +37,18 @@ def walk(da, folderId, outf, depth, topdown=True):
     walk(da, folder['id'], outf, depth + (folder['title'], ))
   if not topdown: outfiles(da, folderId, outf, spc)
 
+def visitCallback(arg, epaths, edirs, efiles=None):
+  outf = arg[0]
+  spc = ' ' * (len(epaths) - 1)
+  joinedepaths = '/'.join(map(lambda a: uenc(a[1]), epaths))
+  if efiles is None:
+    outf.write('%s+%s\n%s %s/\n' % (
+      spc, uenc(epaths[-1][2]), spc, joinedepaths))
+  else:
+    for ef in efiles:
+      outf.write('%s -%s %s\n%s  %s/%s\n' % (
+        spc, uenc(ef[2]), uenc(ef[3]), spc, joinedepaths, uenc(ef[1])))
+
 def proc_iter(outf, epaths, edirs, efiles, topdown=True):
   spc = ' ' * len(epaths)
   joinedepaths = '/'.join(map(lambda a: uenc(a[1]), epaths))
@@ -54,12 +66,21 @@ def proc_iter(outf, epaths, edirs, efiles, topdown=True):
 
 def main(basedir):
   da = googleDriveAccess.DAClient(basedir) # clientId=None, script=False
+
   f = open(os.path.join(basedir, 'hierarchy_topdown.txt'), 'wb')
   walk(da, 'root', f, ('', ))
   f.close()
   f = open(os.path.join(basedir, 'hierarchy_bottomup.txt'), 'wb')
   walk(da, 'root', f, ('', ), topdown=False)
   f.close()
+
+  f = open(os.path.join(basedir, 'hierarchy_visit_topdown.txt'), 'wb')
+  da.walk_visit('root', visitCallback, [f])
+  f.close()
+  f = open(os.path.join(basedir, 'hierarchy_visit_bottomup.txt'), 'wb')
+  da.walk_visit('root', visitCallback, [f], topdown=False)
+  f.close()
+
   f = open(os.path.join(basedir, 'hierarchy_iter_topdown.txt'), 'wb')
   for epaths, edirs, efiles in da.walk_iter('root'):
     proc_iter(f, epaths, edirs, efiles)
