@@ -42,15 +42,14 @@ def prepare_folder(da, folderIds, folder):
   if row is None:
     parent, p = os.path.split(q)
     parentId, r = prepare_folder(da, folderIds, parent)
-    query = "'%s' in parents and mimeType='%s' and explicitlyTrashed=False" % (
-      parentId, FOLDER_TYPE)
-    entries = da.execQuery(query, True, True, **{'maxResults': 200})
-    for e in entries:
-      if e[1] == p:
-        folderId = e[2]
-        break
-    else:
+    query = "'%s' in parents and title='%s' and mimeType='%s' %s" % (
+      parentId, p, FOLDER_TYPE, 'and explicitlyTrashed=False')
+    entries = da.execQuery(query, True, True, **{'maxResults': 2})
+    if not len(entries['items']):
       folderId, folderObj = da.createFolder(p, parentId)
+    else:
+      folderId = entries['items'][0][2]
+      if len(entries['items']) > 1: sys.stderr.write('duplicated [%s]\a\n' % q)
     cn = sqlite3.connect(folderIds)
     cn.execute('''insert into folderIds (key, val) values ('%s', '%s');''' % (
       folderId, q))
@@ -96,6 +95,7 @@ on clientIds (client_id);''')
 key varchar(%d) primary key not null,
 val varchar(%d) unique not null,
 cli integer default 1,
+fol integer default 1,
 flg integer default 0);''' % (
       MAX_KEY_LEN, MAX_PATH_LEN))
     cn.execute('''create unique index folderIds_idx_val
