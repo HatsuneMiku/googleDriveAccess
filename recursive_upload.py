@@ -79,7 +79,8 @@ def recursive_upload(da, basedir, backup, folderIds):
       print 'D %s %s' % (q, d) # os.path.join(path, d)
     for f in files:
       print 'F %s %s' % (q, f) # os.path.join(path, f)
-      uploadFile(da, path, f, p_id)
+      fileId, fileObj = uploadFile(da, path, f, p_id)
+      # pprint.pprint((fileId, fileObj))
 
 def main(basedir):
   folderIds = os.path.join(basedir, CACHE_FOLDERIDS)
