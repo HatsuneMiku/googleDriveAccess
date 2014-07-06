@@ -35,7 +35,9 @@ def prepare_folder(da, folderIds, folder):
   cn = sqlite3.connect(folderIds)
   cn.row_factory = sqlite3.Row
   cur = cn.cursor()
-  cur.execute('''select key, val from folderIds where val='%s';''' % q)
+  cur.execute(
+    '''select key from folderIds where val='%s' and cli=%d and fol=1;''' % (
+      q, 1))
   row = cur.fetchone()
   cur.close()
   cn.close()
@@ -48,8 +50,9 @@ def prepare_folder(da, folderIds, folder):
     if not len(entries['items']):
       folderId, folderObj = da.createFolder(p, parentId)
     else:
-      folderId = entries['items'][0][2]
-      if len(entries['items']) > 1: sys.stderr.write('duplicated [%s]\a\n' % q)
+      folderId = entries['items'][0]['id']
+      if len(entries['items']) > 1:
+        sys.stderr.write('duplicated folder [%s]\a\n' % q)
     cn = sqlite3.connect(folderIds)
     cn.execute('''insert into folderIds (key, val) values ('%s', '%s');''' % (
       folderId, q))
@@ -59,14 +62,50 @@ def prepare_folder(da, folderIds, folder):
     folderId = row['key']
   return (folderId, q)
 
-def uploadFile(da, path, filename, parentId):
+def process_file(da, folderIds, path, filename, parentId, parent):
+  cn = sqlite3.connect(folderIds)
+  cn.row_factory = sqlite3.Row
+  cur = cn.cursor()
+  cur.execute(
+    '''select key from folderIds where val='%s' and cli=%d and fol=0;''' % (
+      '%s/%s' % (parent, filename), 1))
+  row = cur.fetchone()
+  cur.close()
+  cn.close()
+  if row is None:
+    query = "'%s' in parents and title='%s' and mimeType!='%s' %s" % (
+      parentId, filename, FOLDER_TYPE, 'and explicitlyTrashed=False')
+    entries = da.execQuery(query, True, True, **{'maxResults': 2})
+    if not len(entries['items']):
+      fileId, fileObj = uploadFile(da, path, filename, parentId)
+    else:
+      fileId = entries['items'][0]['id']
+      if len(entries['items']) > 1:
+        sys.stderr.write('duplicated file [%s/%s]\a\n' % (parent, filename))
+      fileId, fileObj = uploadFile(da, path, filename, parentId, fileId)
+    cn = sqlite3.connect(folderIds)
+    cn.execute(
+      '''insert into folderIds (key, val, fol) values ('%s', '%s', 0);''' % (
+        fileId, '%s/%s' % (parent, filename)))
+    cn.commit()
+    cn.close()
+  else:
+    fileId, fileObj = uploadFile(da, path, filename, parentId, row['key'])
+  return (fileId, fileObj)
+
+def uploadFile(da, path, filename, parentId, fileId=None):
   #body = {'title': filename, 'mimeType': mimetype, 'description': description}
   body = {'title': filename, 'description': filename}
   body['parents'] = [{'id': parentId}]
   filepath = os.path.join(path, filename)
   #mbody = MediaFileUpload(filepath, mimetype=mimetype, resumable=True)
   mbody = MediaFileUpload(filepath, resumable=True)
-  fileObj = da.drive_service.files().insert(body=body, media_body=mbody).execute()
+  ds = da.drive_service
+  if fileId is None:
+    fileObj = ds.files().insert(body=body, media_body=mbody).execute()
+  else:
+    fileObj = ds.files().update(fileId=fileId,
+      body=body, media_body=mbody).execute()
   return (fileObj['id'], fileObj)
 
 def recursive_upload(da, basedir, backup, folderIds):
@@ -78,7 +117,7 @@ def recursive_upload(da, basedir, backup, folderIds):
       print 'D %s %s' % (q, d) # os.path.join(path, d)
     for f in files:
       print 'F %s %s' % (q, f) # os.path.join(path, f)
-      fileId, fileObj = uploadFile(da, path, f, p_id)
+      fileId, fileObj = process_file(da, folderIds, path, f, p_id, q)
       # pprint.pprint((fileId, fileObj))
 
 def main(basedir):
