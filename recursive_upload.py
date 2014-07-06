@@ -18,6 +18,7 @@ import logging
 logging.basicConfig()
 
 FOLDER_TYPE = 'application/vnd.google-apps.folder'
+MAX_CID_LEN = 256
 MAX_KEY_LEN = 256
 MAX_PATH_LEN = 1024
 CACHE_FOLDERIDS = 'cache_folderIds.sl3'
@@ -41,7 +42,8 @@ def prepare_folder(da, folderIds, folder):
   if row is None:
     parent, p = os.path.split(q)
     parentId, r = prepare_folder(da, folderIds, parent)
-    query = "'%s' in parents and mimeType='%s'" % (parentId, FOLDER_TYPE)
+    query = "'%s' in parents and mimeType='%s' and explicitlyTrashed=False" % (
+      parentId, FOLDER_TYPE)
     entries = da.execQuery(query, True, True, **{'maxResults': 200})
     for e in entries:
       if e[1] == p:
@@ -83,10 +85,22 @@ def main(basedir):
   folderIds = os.path.join(basedir, CACHE_FOLDERIDS)
   if not os.path.exists(folderIds):
     cn = sqlite3.connect(folderIds)
+    cn.execute('''create table clientIds (
+cli integer primary key autoincrement,
+client_id varchar(%d) unique not null);''' % (
+      MAX_CID_LEN))
+    cn.execute('''create unique index clientIds_idx_client_id
+on clientIds (client_id);''')
     cn.execute('''create table folderIds (
-key varchar(%d) primary key not null, val varchar(%d) unique not null);''' % (
+key varchar(%d) primary key not null,
+val varchar(%d) unique not null,
+cli integer default 1,
+flg integer default 0);''' % (
       MAX_KEY_LEN, MAX_PATH_LEN))
-    cn.execute('''create unique index folderIds_idx_val on folderIds (val);''')
+    cn.execute('''create unique index folderIds_idx_val
+on folderIds (val);''')
+    cn.execute('''create index folderIds_idx_cli
+on folderIds (cli);''')
     cn.execute('''insert into folderIds (key, val) values ('root', '/');''')
     cn.commit()
     cn.close()
