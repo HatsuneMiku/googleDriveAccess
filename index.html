@@ -32,7 +32,7 @@
       <section>
         <div id="title">
           <h1>googleDriveAccess</h1>
-          <p>googleDriveAccess.py and tests for upload and download ( import and export ) Google Apps Script source codes</p>
+          <p>googleDriveAccess.py is a Python tool to Access to the Google Drive and upload and download ( import and export ) Google Apps Script source codes</p>
           <hr>
           <span class="credits left">Project maintained by <a href="https://github.com/HatsuneMiku">HatsuneMiku</a></span>
           <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
@@ -42,6 +42,25 @@
 <a name="googledriveaccess" class="anchor" href="#googledriveaccess"><span class="octicon octicon-link"></span></a>googleDriveAccess</h1>
 
 <p>a Python tool to Access to the Google Drive</p>
+
+<h2>
+<a name="sample" class="anchor" href="#sample"><span class="octicon octicon-link"></span></a>Sample</h2>
+
+<div class="highlight highlight-python"><pre>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">googleDriveAccess</span>
+
+<span class="c"># create instance</span>
+<span class="n">da</span> <span class="o">=</span> <span class="n">googleDriveAccess</span><span class="o">.</span><span class="n">DAClient</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s">'.'</span><span class="p">))</span>
+
+<span class="c"># create parent folders at the same time</span>
+<span class="n">folderId</span><span class="p">,</span> <span class="n">folderPath</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">makeDirs</span><span class="p">(</span><span class="s">'/remote_drive/subfolder_test/subsubfolder'</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">folderId</span><span class="p">,</span> <span class="n">folderPath</span>
+
+<span class="c"># recursive backup to remote folder</span>
+<span class="n">da</span><span class="o">.</span><span class="n">recursiveUpload</span><span class="p">(</span><span class="s">'a_local_directory_you_want_to_backup_recursively'</span><span class="p">)</span>
+
+</pre></div>
 
 <h2>
 <a name="how-to-use-it" class="anchor" href="#how-to-use-it"><span class="octicon octicon-link"></span></a>How to use it</h2>
