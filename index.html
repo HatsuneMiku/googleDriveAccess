@@ -66,6 +66,8 @@
 <a name="how-to-use-it" class="anchor" href="#how-to-use-it"><span class="octicon octicon-link"></span></a>How to use it</h2>
 
 <ul>
+<li><p>pip install 'google-api-python-client'</p></li>
+<li><p>pip install googleDriveAccess</p></li>
 <li><p>register your App on <a href="https://console.developers.google.com/project">https://console.developers.google.com/project</a> and <em>'download JSON'</em> of your Client ID and Client secret</p></li>
 <li><p>rename this JSON file to './client_secret_[Client ID].json'</p></li>
 <li><p>create './cicache.txt' file and write your Client ID to the first line.</p></li>
@@ -81,7 +83,29 @@
 <li><p>edit downloaded script './script_import_export/test_GoogleAppsScript_createCalendarEvent/Code.gs'</p></li>
 <li><p>edit test_script_import_export.py (set 'mode = 1') to test upload</p></li>
 <li><p>execute test_script_import_export.py to test upload</p></li>
-</ul>
+</ul><h2>
+<a name="known-bugs" class="anchor" href="#known-bugs"><span class="octicon octicon-link"></span></a>Known BUGs</h2>
+
+<p>When uploading a file that would not be automaticaly handled Google Drive,
+"Media type 'None' is not supported. Valid media types: [<em>/</em>]"
+error occurred.
+Because of default mimeType is set to None on uploadFile.
+So it may correct to catch the exception and retry with 'binary/octet-stream'.</p>
+
+<h2>
+<a name="links" class="anchor" href="#links"><span class="octicon octicon-link"></span></a>Links</h2>
+
+<p>You can get test_*.py files at GitHub repository.
+<a href="https://github.com/HatsuneMiku/googleDriveAccess">https://github.com/HatsuneMiku/googleDriveAccess</a></p>
+
+<p>GitHub HomePage <a href="http://hatsunemiku.github.io/googleDriveAccess">http://hatsunemiku.github.io/googleDriveAccess</a></p>
+
+<p>PyPI <a href="https://pypi.python.org/pypi/googleDriveAccess">https://pypi.python.org/pypi/googleDriveAccess</a></p>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>BSD License</p>
       </section>
 
     </div>
