@@ -3,6 +3,28 @@ googleDriveAccess
 
 a Python tool to Access to the Google Drive
 
+
+Sample
+------
+
+``` python
+
+import os
+import googleDriveAccess
+
+# create instance
+da = googleDriveAccess.DAClient(os.path.abspath('.'))
+
+# create parent folders at the same time
+folderId, folderPath = da.makeDirs('/remote_drive/subfolder_test/subsubfolder')
+print folderId, folderPath
+
+# recursive backup to remote folder
+da.recursiveUpload('a_local_directory_you_want_to_backup_recursively')
+
+```
+
+
 How to use it
 -------------
 
