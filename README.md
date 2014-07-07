@@ -28,6 +28,10 @@ da.recursiveUpload('a_local_directory_you_want_to_backup_recursively')
 How to use it
 -------------
 
+- pip install 'google-api-python-client'
+
+- pip install googleDriveAccess
+
 - register your App on https://console.developers.google.com/project and *'download JSON'* of your Client ID and Client secret
 
 - rename this JSON file to './client_secret_[Client ID].json'
@@ -57,4 +61,31 @@ How to use it
 - edit test_script_import_export.py (set 'mode = 1') to test upload
 
 - execute test_script_import_export.py to test upload
+
+
+Known BUGs
+----------
+
+When uploading a file that would not be automaticaly handled Google Drive,
+"Media type 'None' is not supported. Valid media types: [*/*]"
+error occurred.
+Because of default mimeType is set to None on uploadFile.
+So it may correct to catch the exception and retry with 'binary/octet-stream'.
+
+
+Links
+-----
+
+You can get test_*.py files at GitHub repository.
+https://github.com/HatsuneMiku/googleDriveAccess
+
+GitHub HomePage http://hatsunemiku.github.io/googleDriveAccess
+
+PyPI https://pypi.python.org/pypi/googleDriveAccess
+
+
+License
+-------
+
+BSD License
 

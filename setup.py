@@ -12,7 +12,7 @@ setup(**{
   'author'          : '999hatsune',
   'author_email'    : '999hatsune@gmail.com',
   'url'             : 'https://github.com/HatsuneMiku/googleDriveAccess',
-  'download_url'    : 'https://github.com/HatsuneMiku/googleDriveAccess/raw/0.0.1/googleDriveAccess-0.0.1.tar.gz',
+  'download_url'    : 'https://pypi.python.org/packages/source/g/googleDriveAccess/googleDriveAccess-0.0.1.tar.gz',
   'packages'        : ['googleDriveAccess'],
   'package_dir'     : {'googleDriveAccess': './googleDriveAccess'},
   'package_data'    : {
