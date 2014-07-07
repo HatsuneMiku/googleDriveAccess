@@ -12,7 +12,7 @@ setup(**{
   'author'          : '999hatsune',
   'author_email'    : '999hatsune@gmail.com',
   'url'             : 'https://github.com/HatsuneMiku/googleDriveAccess',
-  'download_url'    : 'https://github.com/HatsuneMiku/googleDriveAccess/tarball/0.0.1',
+  'download_url'    : 'https://github.com/HatsuneMiku/googleDriveAccess/raw/0.0.1/googleDriveAccess-0.0.1.tar.gz',
   'packages'        : ['googleDriveAccess'],
   'package_dir'     : {'googleDriveAccess': './googleDriveAccess'},
   'package_data'    : {
@@ -21,7 +21,7 @@ setup(**{
     ]
   },
   'data_files'      : [
-    ('', [
+    ('/opt/googleDriveAccess', [
       'README.md',
       'encrypt_client_secret.py',
       'cicache.txt',
