@@ -35,9 +35,9 @@ def prepare_folder(da, folderIds, folder):
   cn = sqlite3.connect(folderIds)
   cn.row_factory = sqlite3.Row
   cur = cn.cursor()
-  cur.execute(
-    '''select key from folderIds where val='%s' and cli=%d and fol=1;''' % (
-      q, 1))
+  cur.execute('''\
+select key from folderIds where val=? and cli=? and fol=? and flg=?;''', (
+    q, 1, 1, 0))
   row = cur.fetchone()
   cur.close()
   cn.close()
@@ -54,8 +54,9 @@ def prepare_folder(da, folderIds, folder):
       if len(entries['items']) > 1:
         sys.stderr.write('duplicated folder [%s]\a\n' % q)
     cn = sqlite3.connect(folderIds)
-    cn.execute('''insert into folderIds (key, val) values ('%s', '%s');''' % (
-      folderId, q))
+    cn.execute('''\
+insert into folderIds (key, val, cli, fol, flg) values (?, ?, ?, ?, ?);''', (
+      folderId, q, 1, 1, 0))
     cn.commit()
     cn.close()
   else:
@@ -66,9 +67,9 @@ def process_file(da, folderIds, path, filename, parentId, parent):
   cn = sqlite3.connect(folderIds)
   cn.row_factory = sqlite3.Row
   cur = cn.cursor()
-  cur.execute(
-    '''select key from folderIds where val='%s' and cli=%d and fol=0;''' % (
-      '%s/%s' % (parent, filename), 1))
+  cur.execute('''\
+select key from folderIds where val=? and cli=? and fol=? and flg=?;''', (
+    '%s/%s' % (parent, filename), 1, 0, 0))
   row = cur.fetchone()
   cur.close()
   cn.close()
@@ -84,9 +85,9 @@ def process_file(da, folderIds, path, filename, parentId, parent):
         sys.stderr.write('duplicated file [%s/%s]\a\n' % (parent, filename))
       fileId, fileObj = uploadFile(da, path, filename, parentId, fileId)
     cn = sqlite3.connect(folderIds)
-    cn.execute(
-      '''insert into folderIds (key, val, fol) values ('%s', '%s', 0);''' % (
-        fileId, '%s/%s' % (parent, filename)))
+    cn.execute('''\
+insert into folderIds (key, val, cli, fol, flg) values (?, ?, ?, ?, ?);''', (
+      fileId, '%s/%s' % (parent, filename), 1, 0, 0))
     cn.commit()
     cn.close()
   else:
@@ -124,24 +125,27 @@ def main(basedir):
   folderIds = os.path.join(basedir, CACHE_FOLDERIDS)
   if not os.path.exists(folderIds):
     cn = sqlite3.connect(folderIds)
-    cn.execute('''create table clientIds (
-cli integer primary key autoincrement,
-client_id varchar(%d) unique not null);''' % (
+    cn.execute('''\
+create table clientIds (
+ cli integer primary key autoincrement,
+ client_id varchar(%d) unique not null);''' % (
       MAX_CID_LEN))
-    cn.execute('''create unique index clientIds_idx_client_id
-on clientIds (client_id);''')
-    cn.execute('''create table folderIds (
-key varchar(%d) primary key not null,
-val varchar(%d) unique not null,
-cli integer default 1,
-fol integer default 1,
-flg integer default 0);''' % (
+    cn.execute('''\
+create unique index clientIds_idx_client_id on clientIds (client_id);''')
+    cn.execute('''\
+create table folderIds (
+ key varchar(%d) primary key not null,
+ val varchar(%d) unique not null,
+ cli integer default 1,
+ fol integer default 1,
+ flg integer default 0);''' % (
       MAX_KEY_LEN, MAX_PATH_LEN))
-    cn.execute('''create unique index folderIds_idx_val
-on folderIds (val);''')
-    cn.execute('''create index folderIds_idx_cli
-on folderIds (cli);''')
-    cn.execute('''insert into folderIds (key, val) values ('root', '/');''')
+    cn.execute('''\
+create unique index folderIds_idx_val on folderIds (val);''')
+    cn.execute('''\
+create index folderIds_idx_cli on folderIds (cli);''')
+    cn.execute('''\
+insert into folderIds (key, val) values ('root', '/');''')
     cn.commit()
     cn.close()
   da = googleDriveAccess.DAClient(basedir)
