@@ -6,6 +6,7 @@ https://www.youtube.com/watch?v=lEVMu9KE6jk
 '''
 
 import sys, os
+import sqlite3
 import getpass
 import random
 import hashlib
@@ -28,6 +29,10 @@ OAUTH_SCOPE = [
 CICACHE_FILE = 'cicache.txt'
 CLIENT_FILE = 'client_secret_%s.json.enc'
 CREDENTIAL_FILE = 'credentials_%s.json.enc'
+CACHE_FOLDERIDS = 'cache_folderIds.sl3'
+MAX_CID_LEN = 256
+MAX_KEY_LEN = 256
+MAX_PATH_LEN = 1024
 
 MANIFEST = 'manifest.json'
 SCRIPT_TYPE = 'application/vnd.google-apps.script+json'
@@ -136,6 +141,8 @@ class DAClient(object):
     self.drive_service = None
     if self.clientId is None:
       self.clientId = readClientId(self.basedir)
+    self.folderIds = os.path.join(self.basedir, CACHE_FOLDERIDS)
+    self.initializeCacheFolderIds()
     if not firstonly:
       if self.second_authorize() is None:
         return None
@@ -248,11 +255,139 @@ class DAClient(object):
     for ep, ed, ef in procfolders(epaths, folders):
       yield ep, ed, ef
 
+  def initializeCacheFolderIds(self):
+    if os.path.exists(self.folderIds): return
+    cn = sqlite3.connect(self.folderIds)
+    cn.execute('''\
+create table clientIds (
+ cli integer primary key autoincrement,
+ client_id varchar(%d) unique not null);''' % (
+      MAX_CID_LEN))
+    cn.execute('''\
+create unique index clientIds_idx_client_id on clientIds (client_id);''')
+    cn.execute('''\
+insert into clientIds (client_id) values (?);''', (
+      self.clientId, )) # cli must be set to 1
+    cn.execute('''\
+create table folderIds (
+ key varchar(%d) primary key not null,
+ val varchar(%d) unique not null,
+ cli integer default 1,
+ fol integer default 1,
+ flg integer default 0);''' % (
+      MAX_KEY_LEN, MAX_PATH_LEN))
+    cn.execute('''\
+create unique index folderIds_idx_val on folderIds (val);''')
+    cn.execute('''\
+create index folderIds_idx_cli on folderIds (cli);''')
+    cn.execute('''\
+insert into folderIds (key, val) values ('root', '/');''')
+    cn.commit()
+    cn.close()
+
   def createFolder(self, name, parentId='root'):
     body = {'title': name, 'mimeType': FOLDER_TYPE, 'description': name}
     body['parents'] = [{'id': parentId}]
     folder = self.drive_service.files().insert(body=body).execute()
     return (folder['id'], folder)
+
+  def uploadFile(self, path, filename, parentId, fileId=None):
+    # body = {'title': filename, 'mimeType': mimetype, 'description': filename}
+    body = {'title': filename, 'description': filename}
+    body['parents'] = [{'id': parentId}]
+    filepath = os.path.join(path, filename)
+    # mbody = MediaFileUpload(filepath, mimetype=mimetype, resumable=True)
+    mbody = MediaFileUpload(filepath, resumable=True)
+    if fileId is None:
+      fileObj = self.drive_service.files().insert(
+        body=body, media_body=mbody).execute()
+    else:
+      fileObj = self.drive_service.files().update(
+        fileId=fileId, body=body, media_body=mbody).execute()
+    return (fileObj['id'], fileObj)
+
+  def prepare_folder(self, folder):
+    q = folder.replace('\\', '/')
+    if len(q) > MAX_PATH_LEN:
+      raise Exception('folder length is too long > %s' % MAX_PATH_LEN)
+    if q[0] != '/':
+      raise Exception('folder does not start with / [%s]' % folder)
+    if q[-1] == '/' or not len(q): # root or endswith '/'
+      return ('root', '/')
+    cn = sqlite3.connect(self.folderIds)
+    cn.row_factory = sqlite3.Row
+    cur = cn.cursor()
+    cur.execute('''\
+select key from folderIds where val=? and cli=? and fol=? and flg=?;''', (
+      q, 1, 1, 0))
+    row = cur.fetchone()
+    cur.close()
+    cn.close()
+    if row is None:
+      parent, p = os.path.split(q)
+      parentId, r = self.prepare_folder(parent)
+      query = "'%s' in parents and title='%s' and mimeType='%s' %s" % (
+        parentId, p, FOLDER_TYPE, 'and explicitlyTrashed=False')
+      entries = self.execQuery(query, True, True, **{'maxResults': 2})
+      if not len(entries['items']):
+        folderId, folderObj = self.createFolder(p, parentId)
+      else:
+        folderId = entries['items'][0]['id']
+        if len(entries['items']) > 1:
+          sys.stderr.write('duplicated folder [%s]\a\n' % q)
+      cn = sqlite3.connect(self.folderIds)
+      cn.execute('''\
+insert into folderIds (key, val, cli, fol, flg) values (?, ?, ?, ?, ?);''', (
+        folderId, q, 1, 1, 0))
+      cn.commit()
+      cn.close()
+    else:
+      folderId = row['key']
+    return (folderId, q)
+
+  def process_file(self, path, filename, parentId, parent):
+    cn = sqlite3.connect(self.folderIds)
+    cn.row_factory = sqlite3.Row
+    cur = cn.cursor()
+    cur.execute('''\
+select key from folderIds where val=? and cli=? and fol=? and flg=?;''', (
+      '%s/%s' % (parent, filename), 1, 0, 0))
+    row = cur.fetchone()
+    cur.close()
+    cn.close()
+    if row is None:
+      query = "'%s' in parents and title='%s' and mimeType!='%s' %s" % (
+        parentId, filename, FOLDER_TYPE, 'and explicitlyTrashed=False')
+      entries = self.execQuery(query, True, True, **{'maxResults': 2})
+      if not len(entries['items']):
+        fileId, fileObj = self.uploadFile(path, filename, parentId)
+      else:
+        fileId = entries['items'][0]['id']
+        if len(entries['items']) > 1:
+          sys.stderr.write('duplicated file [%s/%s]\a\n' % (parent, filename))
+        fileId, fileObj = self.uploadFile(path, filename, parentId, fileId)
+      cn = sqlite3.connect(self.folderIds)
+      cn.execute('''\
+insert into folderIds (key, val, cli, fol, flg) values (?, ?, ?, ?, ?);''', (
+        fileId, '%s/%s' % (parent, filename), 1, 0, 0))
+      cn.commit()
+      cn.close()
+    else:
+      fileId, fileObj = self.uploadFile(path, filename, parentId, row['key'])
+    return (fileId, fileObj)
+
+  def recursiveUpload(self, remote):
+    basedir = self.basedir
+    b = os.path.join(basedir, remote)
+    remote_id, q = self.prepare_folder(b[len(basedir):]) # set [0]='/'
+    for path, dirs, files in os.walk(b):
+      p_id, q = self.prepare_folder(path[len(basedir):]) # set [0]='/'
+      for d in dirs:
+        print 'D %s %s' % (q, d) # os.path.join(path, d)
+      for f in files:
+        print 'F %s %s' % (q, f) # os.path.join(path, f)
+        fileId, fileObj = self.process_file(path, f, p_id, q)
+        # pprint.pprint((fileId, fileObj))
 
 class DAScript(DAClient):
   def __init__(self, basedir, folder, clientId=None):
