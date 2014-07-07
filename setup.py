@@ -1,9 +1,9 @@
-from setuptools import setup
+from distutils.core import setup
 
 long_description = open('README.md', 'rb').read()
 requirements = open('requirements.txt', 'rb').read().splitlines()
 
-setup({
+setup(**{
   'name'            : 'googleDriveAccess',
   'version'         : '0.0.1',
   'keywords'        : 'google drive googledrive recursive upload backup import export apps script',
@@ -13,20 +13,24 @@ setup({
   'author_email'    : '999hatsune@gmail.com',
   'url'             : 'https://github.com/HatsuneMiku/googleDriveAccess',
   'download_url'    : 'https://github.com/HatsuneMiku/googleDriveAccess/tarball/0.0.1',
-  'packages'        : [
-    'googleDriveAccess.py',
-    'encrypt_client_secret.py'
-  ],
+  'packages'        : ['googleDriveAccess'],
+  'package_dir'     : {'googleDriveAccess': './googleDriveAccess'},
   'package_data'    : {
-    '': [
-      'README.md',
-      'cicache.txt'
+    'googleDriveAccess': [
+      'test/test.txt'
     ]
   },
-  'install_requires': requirements,
+  'data_files'      : [
+    ('', [
+      'README.md',
+      'encrypt_client_secret.py',
+      'cicache.txt',
+      'requirements.txt'
+    ])
+  ],
+  'requires'        : requirements,
   'license'         : 'BSD License',
   'classifiers'     : [
-    'Development Status :: 0.0.1',
     'License :: OSI Approved :: BSD License',
     'Programming Language :: Python :: 2.5',
     'Programming Language :: Python :: 2.6',
