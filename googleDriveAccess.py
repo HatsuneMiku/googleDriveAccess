@@ -285,7 +285,16 @@ insert into folderIds (key, val) values ('root', '/');''')
     cn.commit()
     cn.close()
 
+  def makeDirs(self, folder):
+    '''folder must start with '/'
+    returns id string, folder string
+    '''
+    return self.prepare_folder(folder)
+
   def createFolder(self, name, parentId='root'):
+    '''name must *NOT* contain '/'
+    returns id string, folder Object
+    '''
     body = {'title': name, 'mimeType': FOLDER_TYPE, 'description': name}
     body['parents'] = [{'id': parentId}]
     folder = self.drive_service.files().insert(body=body).execute()

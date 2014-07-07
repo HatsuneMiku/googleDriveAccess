@@ -18,9 +18,6 @@ BACKUP = 'recursive_upload_backup'
 def main(basedir):
   da = googleDriveAccess.DAClient(basedir)
   da.recursiveUpload(BACKUP)
-  # test for bottomup directory creation
-  for subfolder in ['sub1/sub2', 'sub1/sub3', 'sub4']:
-    p_id, q = da.prepare_folder('/%s/testbottomup/%s' % (BACKUP, subfolder))
 
 if __name__ == '__main__':
   logging.getLogger().setLevel(getattr(logging, 'INFO')) # ERROR
