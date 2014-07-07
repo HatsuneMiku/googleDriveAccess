@@ -1,5 +1,4 @@
-google-api-python-client >= 1.2
-httplib2 >= 0.8
-pycrypto >= 2.3
-simplejson >= 3.3.1
-ssl >= 1.15
+httplib2
+pycrypto
+simplejson
+ssl
