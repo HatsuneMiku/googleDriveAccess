@@ -5,14 +5,14 @@ requirements = open('requirements.txt', 'rb').read().splitlines()
 
 setup(**{
   'name'            : 'googleDriveAccess',
-  'version'         : '0.0.1',
+  'version'         : '0.0.2',
   'keywords'        : 'google drive googledrive recursive upload backup import export apps script',
   'description'     : ('recursive upload to Google Drive and import-export Google Apps Script source code'),
   'long_description': long_description,
   'author'          : '999hatsune',
   'author_email'    : '999hatsune@gmail.com',
   'url'             : 'https://github.com/HatsuneMiku/googleDriveAccess',
-  'download_url'    : 'https://pypi.python.org/packages/source/g/googleDriveAccess/googleDriveAccess-0.0.1.tar.gz',
+  'download_url'    : 'https://pypi.python.org/packages/source/g/googleDriveAccess/googleDriveAccess-0.0.2.tar.gz',
   'packages'        : ['googleDriveAccess'],
   'package_dir'     : {'googleDriveAccess': './googleDriveAccess'},
   'package_data'    : {
