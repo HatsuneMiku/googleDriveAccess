@@ -22,7 +22,7 @@ from oauth2client.anyjson import simplejson
 
 import logging
 
-__version__ = '0.0.5'
+__version__ = '0.0.6'
 
 OAUTH_SCOPE = [
   'https://www.googleapis.com/auth/drive',
