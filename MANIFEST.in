@@ -1,4 +1,10 @@
 include README.md
-include cicache.txt
-include encrypt_client_secret.py
 include requirements.txt
+include cicache.txt
+include *_CLIENT_ID.json.enc
+include encrypt_client_secret.py
+include recursive_upload.py
+include test_*.py
+include test_document.txt
+include script_import_export/test_GoogleAppsScript_createCalendarEvent/*
+include googleDriveAccess/test/*

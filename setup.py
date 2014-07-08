@@ -1,34 +1,66 @@
 from distutils.core import setup
 
+PKG_VER = '0.0.3'
+PKG_TITLE = 'googleDriveAccess'
+PKG_URL = 'https://github.com/HatsuneMiku/%s' % PKG_TITLE
+PKG_KWD = '''\
+google drive googledrive recursive upload backup import export apps script'''
+PKG_DSC = '''\
+recursive upload to Google Drive and \
+import-export Google Apps Script source code'''
+AUTHOR = '999hatsune'
+AUTHOR_EMAIL = '999hatsune@gmail.com'
+TEST_DATA = '/opt/%s' % PKG_TITLE
+TEST_GAS = 'script_import_export/test_GoogleAppsScript_createCalendarEvent'
+
+PYPI_PKGSRC = 'https://pypi.python.org/packages/source'
+PYPI_DLURL = '%s/%c/%s/%s-%s.tar.gz' % (
+  PYPI_PKGSRC, PKG_TITLE[0], PKG_TITLE, PKG_TITLE, PKG_VER)
+
 long_description = open('README.md', 'rb').read()
-requirements = open('requirements.txt', 'rb').read().splitlines()
+pkg_requirements = map(lambda a: a.split('>')[0],
+  open('requirements.txt', 'rb').read().splitlines())
 
 setup(**{
-  'name'            : 'googleDriveAccess',
-  'version'         : '0.0.2',
-  'keywords'        : 'google drive googledrive recursive upload backup import export apps script',
-  'description'     : ('recursive upload to Google Drive and import-export Google Apps Script source code'),
+  'name'            : PKG_TITLE,
+  'version'         : PKG_VER,
+  'keywords'        : PKG_KWD,
+  'description'     : (PKG_DSC),
   'long_description': long_description,
-  'author'          : '999hatsune',
-  'author_email'    : '999hatsune@gmail.com',
-  'url'             : 'https://github.com/HatsuneMiku/googleDriveAccess',
-  'download_url'    : 'https://pypi.python.org/packages/source/g/googleDriveAccess/googleDriveAccess-0.0.2.tar.gz',
-  'packages'        : ['googleDriveAccess'],
-  'package_dir'     : {'googleDriveAccess': './googleDriveAccess'},
+  'author'          : AUTHOR,
+  'author_email'    : AUTHOR_EMAIL,
+  'url'             : PKG_URL,
+  'download_url'    : PYPI_DLURL,
+  'packages'        : [PKG_TITLE],
+  'package_dir'     : {PKG_TITLE: './%s' % PKG_TITLE},
   'package_data'    : {
-    'googleDriveAccess': [
+    PKG_TITLE: [
       'test/test.txt'
     ]
   },
   'data_files'      : [
-    ('/opt/googleDriveAccess', [
+    (TEST_DATA, [
       'README.md',
-      'encrypt_client_secret.py',
+      'requirements.txt',
       'cicache.txt',
-      'requirements.txt'
+      'client_secret_CLIENT_ID.json.enc',
+      'credentials_CLIENT_ID.json.enc',
+      'encrypt_client_secret.py',
+      'recursive_upload.py',
+      'test_folder_create.py',
+      'test_folder_hierarchy.py',
+      'test_script_import_export.py',
+      'test_script_prefetch.py',
+      'test_upload_first.py',
+      'test_upload_second.py',
+      'test_document.txt'
+    ]),
+    ('%s/%s' % (TEST_DATA, TEST_GAS), [
+      '%s/Code.gs' % TEST_GAS,
+      '%s/manifest.json' % TEST_GAS
     ])
   ],
-  'requires'        : requirements,
+  'requires'        : pkg_requirements,
   'license'         : 'BSD License',
   'classifiers'     : [
     'License :: OSI Approved :: BSD License',
