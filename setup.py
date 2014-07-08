@@ -1,7 +1,21 @@
 from distutils.core import setup
+import os
+import platform
 
-PKG_VER = '0.0.3'
+opt = '/opt' if platform.system() != 'Windows' else os.getenv('LOCALAPPDATA')
+
+try:
+  import pandoc
+  nopd = False
+  if platform.system() != 'Windows':
+    pandoc.core.PANDOC_PATH = 'pandoc'
+  else:
+    pandoc.core.PANDOC_PATH = '%s/Pandoc/pandoc' % (opt, )
+except (Exception, ), e:
+  nopd = True
+
 PKG_TITLE = 'googleDriveAccess'
+PKG_VER = __import__(PKG_TITLE).__version__
 PKG_URL = 'https://github.com/HatsuneMiku/%s' % PKG_TITLE
 PKG_KWD = '''\
 google drive googledrive recursive upload backup import export apps script'''
@@ -10,7 +24,7 @@ recursive upload to Google Drive and \
 import-export Google Apps Script source code'''
 AUTHOR = '999hatsune'
 AUTHOR_EMAIL = '999hatsune@gmail.com'
-TEST_DATA = '/opt/%s' % PKG_TITLE
+TEST_DATA = '%s/%s' % (opt, PKG_TITLE)
 TEST_GAS = 'script_import_export/test_GoogleAppsScript_createCalendarEvent'
 
 PYPI_PKGSRC = 'https://pypi.python.org/packages/source'
@@ -18,6 +32,11 @@ PYPI_DLURL = '%s/%c/%s/%s-%s.tar.gz' % (
   PYPI_PKGSRC, PKG_TITLE[0], PKG_TITLE, PKG_TITLE, PKG_VER)
 
 long_description = open('README.md', 'rb').read()
+if not nopd:
+  pd = pandoc.Document()
+  pd.markdown = long_description
+  long_description = pd.rst
+
 pkg_requirements = map(lambda a: a.split('>')[0],
   open('requirements.txt', 'rb').read().splitlines())
 
@@ -63,10 +82,22 @@ setup(**{
   'requires'        : pkg_requirements,
   'license'         : 'BSD License',
   'classifiers'     : [
+    'Development Status :: 4 - Beta',
+    'Environment :: Console',
+    'Intended Audience :: Developers',
+    'Intended Audience :: System Administrators',
+    'Intended Audience :: End Users/Desktop',
     'License :: OSI Approved :: BSD License',
+    'Natural Language :: English',
+    'Operating System :: OS Independent',
     'Programming Language :: Python :: 2.5',
     'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 2 :: Only'
+    'Programming Language :: Python :: 2 :: Only',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Topic :: System :: Networking',
+    'Topic :: System :: Filesystems',
+    'Topic :: System :: Archiving :: Mirroring',
+    'Topic :: Utilities'
   ]
 })

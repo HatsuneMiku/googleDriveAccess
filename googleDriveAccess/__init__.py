@@ -22,6 +22,8 @@ from oauth2client.anyjson import simplejson
 
 import logging
 
+__version__ = '0.0.4'
+
 OAUTH_SCOPE = [
   'https://www.googleapis.com/auth/drive',
   'https://www.googleapis.com/auth/drive.scripts']
@@ -307,6 +309,7 @@ insert into folderIds (key, val) values ('root', '/');''')
     filepath = os.path.join(path, filename)
     # mbody = MediaFileUpload(filepath, mimetype=mimetype, resumable=True)
     mbody = MediaFileUpload(filepath, resumable=True)
+    if mbody._mimetype is None: mbody._mimetype = 'application/octet-stream'
     if fileId is None:
       fileObj = self.drive_service.files().insert(
         body=body, media_body=mbody).execute()
