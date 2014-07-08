@@ -1,4 +1,4 @@
-httplib2
-pycrypto
-simplejson
-ssl
+httplib2>=0.8
+pycrypto>=2.3
+simplejson>=3.3.1
+ssl>=1.15

@@ -32,6 +32,8 @@ How to use it
 
 - pip install googleDriveAccess
 
+- cd /opt/googleDriveAccess
+
 - register your App on https://console.developers.google.com/project and *'download JSON'* of your Client ID and Client secret
 
 - rename this JSON file to './client_secret_[Client ID].json'
@@ -73,10 +75,19 @@ Because of default mimeType is set to None on uploadFile.
 So it may correct to catch the exception and retry with 'binary/octet-stream'.
 
 
+This program will cache each folder (or file) ids
+assigned by the Google Drive (into the cache file cache_folderIds.sl3) .
+Please search and erase a row that has same id from the cache file
+when you delete your folder or file using another Google Drive client tool.
+
+
+(I will make refresh_cache.py)
+
+
 Links
 -----
 
-You can get test_*.py files at GitHub repository.
+You can get the latest version at this GitHub repository.
 https://github.com/HatsuneMiku/googleDriveAccess
 
 GitHub HomePage http://hatsunemiku.github.io/googleDriveAccess
