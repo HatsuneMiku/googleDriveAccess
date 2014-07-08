@@ -1,4 +1,18 @@
 from distutils.core import setup
+import os
+import platform
+
+opt = '/opt' if platform.system() != 'Windows' else os.getenv('LOCALAPPDATA')
+
+try:
+  import pandoc
+  nopd = False
+  if platform.system() != 'Windows':
+    pandoc.core.PANDOC_PATH = 'pandoc'
+  else:
+    pandoc.core.PANDOC_PATH = '%s/Pandoc/pandoc' % (opt, )
+except (Exception, ), e:
+  nopd = True
 
 PKG_TITLE = 'googleDriveAccess'
 PKG_VER = __import__(PKG_TITLE).__version__
@@ -10,7 +24,7 @@ recursive upload to Google Drive and \
 import-export Google Apps Script source code'''
 AUTHOR = '999hatsune'
 AUTHOR_EMAIL = '999hatsune@gmail.com'
-TEST_DATA = '/opt/%s' % PKG_TITLE
+TEST_DATA = '%s/%s' % (opt, PKG_TITLE)
 TEST_GAS = 'script_import_export/test_GoogleAppsScript_createCalendarEvent'
 
 PYPI_PKGSRC = 'https://pypi.python.org/packages/source'
@@ -18,6 +32,11 @@ PYPI_DLURL = '%s/%c/%s/%s-%s.tar.gz' % (
   PYPI_PKGSRC, PKG_TITLE[0], PKG_TITLE, PKG_TITLE, PKG_VER)
 
 long_description = open('README.md', 'rb').read()
+if not nopd:
+  pd = pandoc.Document()
+  pd.markdown = long_description
+  long_description = pd.rst
+
 pkg_requirements = map(lambda a: a.split('>')[0],
   open('requirements.txt', 'rb').read().splitlines())
 
