@@ -22,6 +22,8 @@ from oauth2client.anyjson import simplejson
 
 import logging
 
+__version__ = '0.0.4'
+
 OAUTH_SCOPE = [
   'https://www.googleapis.com/auth/drive',
   'https://www.googleapis.com/auth/drive.scripts']

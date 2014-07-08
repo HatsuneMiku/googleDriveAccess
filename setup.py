@@ -1,7 +1,7 @@
 from distutils.core import setup
 
-PKG_VER = '0.0.3'
 PKG_TITLE = 'googleDriveAccess'
+PKG_VER = __import__(PKG_TITLE).__version__
 PKG_URL = 'https://github.com/HatsuneMiku/%s' % PKG_TITLE
 PKG_KWD = '''\
 google drive googledrive recursive upload backup import export apps script'''
@@ -63,10 +63,22 @@ setup(**{
   'requires'        : pkg_requirements,
   'license'         : 'BSD License',
   'classifiers'     : [
+    'Development Status :: 4 - Beta',
+    'Environment :: Console',
+    'Intended Audience :: Developers',
+    'Intended Audience :: System Administrators',
+    'Intended Audience :: End Users/Desktop',
     'License :: OSI Approved :: BSD License',
+    'Natural Language :: English',
+    'Operating System :: OS Independent',
     'Programming Language :: Python :: 2.5',
     'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 2 :: Only'
+    'Programming Language :: Python :: 2 :: Only',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Topic :: System :: Networking',
+    'Topic :: System :: Filesystems',
+    'Topic :: System :: Archiving :: Mirroring',
+    'Topic :: Utilities'
   ]
 })
