@@ -65,40 +65,79 @@
 <h2>
 <a name="how-to-use-it" class="anchor" href="#how-to-use-it"><span class="octicon octicon-link"></span></a>How to use it</h2>
 
-<ul>
-<li><p>pip install 'google-api-python-client'</p></li>
-<li><p>pip install googleDriveAccess</p></li>
-<li><p>cd /opt/googleDriveAccess</p></li>
-<li><p>register your App on <a href="https://console.developers.google.com/project">https://console.developers.google.com/project</a> and <em>'download JSON'</em> of your Client ID and Client secret</p></li>
-<li><p>rename this JSON file to './client_secret_[Client ID].json'</p></li>
-<li><p>create './cicache.txt' file and write your Client ID to the first line.</p></li>
-<li><p>execute ./encrypt_client_secret.py to encrypt downloaded JSON file</p></li>
-<li><p>check that encrypted file exists './client_secret_[Client ID].json.enc' and plain text JSON file './client_secret_[Client ID].json' will be deleted</p></li>
-<li><p>execute ./test_upload_first.py to test OAuth2 flow and store credentials</p></li>
-<li><p>execute ./test_upload_second.py to test OAuth2 using stored credentials</p></li>
-<li><p>execute ./test_script_prefetch.py to test Drive API search with query</p></li>
-<li><p>edit test_script_import_export.py (set 'mode = 0') to test create new Google Apps Script 'test_GoogleAppsScript_createCalendarEvent' for tests below</p></li>
-<li><p>execute test_script_import_export.py to test create and <em>'get SCRIPT_ID'</em></p></li>
-<li><p>edit test_script_import_export.py (set 'mode = 2' and <em>'set SCRIPT_ID'</em>) to test download</p></li>
-<li><p>execute test_script_import_export.py to test download</p></li>
-<li><p>edit downloaded script './script_import_export/test_GoogleAppsScript_createCalendarEvent/Code.gs'</p></li>
-<li><p>edit test_script_import_export.py (set 'mode = 1') to test upload</p></li>
-<li><p>execute test_script_import_export.py to test upload</p></li>
-</ul><h2>
+<div class="highlight highlight-sh"><pre>
+pip install <span class="s1">'google-api-python-client'</span>
+pip install googleDriveAccess
+<span class="nb">cd</span> /opt/googleDriveAccess
+
+<span class="c"># register your App on https://console.developers.google.com/project</span>
+<span class="c"># and *'download JSON'* of your Client ID and Client secret</span>
+
+<span class="c"># rename this JSON file to './client_secret_[Client ID].json'</span>
+
+<span class="c"># create './cicache.txt' file and write your Client ID to the first line.</span>
+
+<span class="c"># execute ./encrypt_client_secret.py to encrypt downloaded JSON file</span>
+./encrypt_client_secret.py
+
+<span class="c"># check that encrypted file exists './client_secret_[Client ID].json.enc'</span>
+<span class="c"># and plain text JSON file './client_secret_[Client ID].json' will be deleted</span>
+
+<span class="c"># execute ./test_upload_first.py to test OAuth2 flow and store credentials</span>
+./test_upload_first.py
+
+<span class="c"># execute ./test_upload_second.py to test OAuth2 using stored credentials</span>
+./test_upload_second.py
+
+<span class="c"># execute ./test_script_prefetch.py to test Drive API search with query</span>
+./test_script_prefetch.py
+
+<span class="c"># edit test_script_import_export.py (set 'mode = 0')</span>
+<span class="c"># to test create new Google Apps Script</span>
+<span class="c"># 'test_GoogleAppsScript_createCalendarEvent' for tests below</span>
+
+<span class="c"># execute ./test_script_import_export.py to test create and *'get SCRIPT_ID'*</span>
+./test_script_import_export.py
+
+<span class="c"># edit test_script_import_export.py (set 'mode = 2' and *'set SCRIPT_ID'*)</span>
+<span class="c"># to test download</span>
+
+<span class="c"># execute ./test_script_import_export.py to test download</span>
+./test_script_import_export.py
+
+<span class="c"># edit downloaded script</span>
+<span class="c"># './script_import_export/test_GoogleAppsScript_createCalendarEvent/Code.gs'</span>
+
+<span class="c"># edit test_script_import_export.py (set 'mode = 1') to test upload</span>
+
+<span class="c"># execute ./test_script_import_export.py to test upload</span>
+./test_script_import_export.py
+
+</pre></div>
+
+<h2>
 <a name="known-bugs" class="anchor" href="#known-bugs"><span class="octicon octicon-link"></span></a>Known BUGs</h2>
 
-<p>When uploading a file that would not be automaticaly handled Google Drive,
-"Media type 'None' is not supported. Valid media types: [<em>/</em>]"
-error occurred.
-Because of default mimeType is set to None on uploadFile.
-So it may correct to catch the exception and retry with 'binary/octet-stream'.</p>
+<p>I will make refresh_cache.py :</p>
 
-<p>This program will cache each folder (or file) ids
+<pre><code>
+This program will cache each folder (or file) ids
 assigned by the Google Drive (into the cache file cache_folderIds.sl3) .
 Please search and erase a row that has same id from the cache file
-when you delete your folder or file using another Google Drive client tool.</p>
+when you delete your folder or file using another Google Drive client tool.
 
-<p>(I will make refresh_cache.py)</p>
+</code></pre>
+
+<p>It may be fixed:</p>
+
+<pre><code>
+When uploading a file that would not be automaticaly handled Google Drive,
+"Media type 'None' is not supported. Valid media types: [*/*]"
+error occurred.
+Because of default mimeType is set to None on uploadFile.
+So it may correct to catch the exception and retry with 'binary/octet-stream'.
+
+</code></pre>
 
 <h2>
 <a name="links" class="anchor" href="#links"><span class="octicon octicon-link"></span></a>Links</h2>
