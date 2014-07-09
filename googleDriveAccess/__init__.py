@@ -3,7 +3,14 @@
 '''googleDriveAccess
 Apps Script Crash Course: Import/Export Apps Script Code
 https://www.youtube.com/watch?v=lEVMu9KE6jk
+Google Drive SDK: Searching for files
+https://www.youtube.com/watch?v=DOSvQmQK_HA
 '''
+
+__version__ = '0.0.8'
+__url__ = 'https://github.com/HatsuneMiku/googleDriveAccess'
+__author__ = '999hatsune'
+__author_email__ = '999hatsune@gmail.com'
 
 import sys, os
 import sqlite3
@@ -21,8 +28,6 @@ from oauth2client.anyjson import simplejson
 # import simplejson
 
 import logging
-
-__version__ = '0.0.8'
 
 OAUTH_SCOPE = [
   'https://www.googleapis.com/auth/drive',

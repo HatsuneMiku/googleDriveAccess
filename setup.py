@@ -14,15 +14,16 @@ except (Exception, ), e:
   nopd = True
 
 PKG_TITLE = 'googleDriveAccess'
-PKG_VER = __import__(PKG_TITLE).__version__
-PKG_URL = 'https://github.com/HatsuneMiku/%s' % PKG_TITLE
+mdl = __import__(PKG_TITLE)
+PKG_VER = mdl.__version__
+PKG_URL = mdl.__url__
+AUTHOR = mdl.__author__
+AUTHOR_EMAIL = mdl.__author_email__
 PKG_KWD = '''\
 google drive googledrive recursive upload backup import export apps script'''
 PKG_DSC = '''\
 recursive upload to Google Drive and \
 import-export Google Apps Script source code'''
-AUTHOR = '999hatsune'
-AUTHOR_EMAIL = '999hatsune@gmail.com'
 
 PYPI_PKGSRC = 'https://pypi.python.org/packages/source'
 PYPI_DLURL = '%s/%c/%s/%s-%s.tar.gz' % (
