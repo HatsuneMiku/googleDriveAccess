@@ -1,13 +1,15 @@
 from distutils.core import setup
 import os
-import platform
 
-opt = '/opt' if platform.system() != 'Windows' else os.getenv('LOCALAPPDATA')
+opt = '/opt'
+if os.name == 'nt':
+  if 'LOCALAPPDATA' in os.environ: opt = os.getenv('LOCALAPPDATA')
+  else: opt = os.getenv('APPDATA')
 
 try:
   import pandoc
   nopd = False
-  if platform.system() != 'Windows':
+  if os.name != 'nt':
     pandoc.core.PANDOC_PATH = 'pandoc'
   else:
     pandoc.core.PANDOC_PATH = '%s/Pandoc/pandoc' % (opt, )
