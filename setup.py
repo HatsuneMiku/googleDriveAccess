@@ -1,18 +1,15 @@
 from distutils.core import setup
 import os
 
-opt = '/opt'
-if os.name == 'nt':
-  if 'LOCALAPPDATA' in os.environ: opt = os.getenv('LOCALAPPDATA')
-  else: opt = os.getenv('APPDATA')
-
 try:
   import pandoc
   nopd = False
   if os.name != 'nt':
     pandoc.core.PANDOC_PATH = 'pandoc'
   else:
-    pandoc.core.PANDOC_PATH = '%s/Pandoc/pandoc' % (opt, )
+    if 'LOCALAPPDATA' in os.environ: app = os.getenv('LOCALAPPDATA')
+    else: app = os.getenv('APPDATA')
+    pandoc.core.PANDOC_PATH = '%s/Pandoc/pandoc' % (app, )
 except (Exception, ), e:
   nopd = True
 
@@ -26,8 +23,6 @@ recursive upload to Google Drive and \
 import-export Google Apps Script source code'''
 AUTHOR = '999hatsune'
 AUTHOR_EMAIL = '999hatsune@gmail.com'
-TEST_DATA = '%s/%s' % (opt, PKG_TITLE)
-TEST_GAS = 'script_import_export/test_GoogleAppsScript_createCalendarEvent'
 
 PYPI_PKGSRC = 'https://pypi.python.org/packages/source'
 PYPI_DLURL = '%s/%c/%s/%s-%s.tar.gz' % (
@@ -42,7 +37,44 @@ if not nopd:
 pkg_requirements = map(lambda a: a.split('>')[0],
   open('requirements.txt', 'rb').read().splitlines())
 
-setup(**{
+data_apdx = [
+  'README.md',
+  'requirements.txt',
+  'cicache.txt',
+  'client_secret_CLIENT_ID.json.enc',
+  'credentials_CLIENT_ID.json.enc',
+  'encrypt_client_secret.py',
+  'recursive_upload.py',
+  'test_folder_create.py',
+  'test_folder_hierarchy.py',
+  'test_script_import_export.py',
+  'test_script_prefetch.py',
+  'test_upload_first.py',
+  'test_upload_second.py',
+  'test_document.txt'
+]
+
+TEST_GAS = 'script_import_export/test_GoogleAppsScript_createCalendarEvent'
+data_apdx_sub = map(lambda a: '%s/%s' % (TEST_GAS, a), [
+  'Code.gs',
+  'manifest.json'
+])
+
+if os.name != 'nt':
+  apdx_dir = '/opt/%s' % (PKG_TITLE, ) # setup as data_files
+  pkg_apdx = []
+else: # to avlid SandboxViolation on mkdir
+  apdx_dir = 'test/%s' % (PKG_TITLE, ) # setup as package_data
+  #pkg_apdx = map(lambda a: '%s/%s' % (apdx_dir, a), data_apdx + data_apdx_sub)
+  pkg_apdx = []
+
+package_data = {
+  PKG_TITLE: [
+    'test/test.txt'
+  ] + pkg_apdx
+}
+
+kwargs = {
   'name'            : PKG_TITLE,
   'version'         : PKG_VER,
   'keywords'        : PKG_KWD,
@@ -54,33 +86,7 @@ setup(**{
   'download_url'    : PYPI_DLURL,
   'packages'        : [PKG_TITLE],
   'package_dir'     : {PKG_TITLE: './%s' % PKG_TITLE},
-  'package_data'    : {
-    PKG_TITLE: [
-      'test/test.txt'
-    ]
-  },
-  'data_files'      : [
-    (TEST_DATA, [
-      'README.md',
-      'requirements.txt',
-      'cicache.txt',
-      'client_secret_CLIENT_ID.json.enc',
-      'credentials_CLIENT_ID.json.enc',
-      'encrypt_client_secret.py',
-      'recursive_upload.py',
-      'test_folder_create.py',
-      'test_folder_hierarchy.py',
-      'test_script_import_export.py',
-      'test_script_prefetch.py',
-      'test_upload_first.py',
-      'test_upload_second.py',
-      'test_document.txt'
-    ]),
-    ('%s/%s' % (TEST_DATA, TEST_GAS), [
-      '%s/Code.gs' % TEST_GAS,
-      '%s/manifest.json' % TEST_GAS
-    ])
-  ],
+  'package_data'    : package_data,
   'requires'        : pkg_requirements,
   'license'         : 'BSD License',
   'classifiers'     : [
@@ -102,4 +108,12 @@ setup(**{
     'Topic :: System :: Archiving :: Mirroring',
     'Topic :: Utilities'
   ]
-})
+}
+
+if os.name != 'nt':
+  kwargs['data_files'] = [
+    (apdx_dir, data_apdx),
+    ('%s/%s' % (apdx_dir, TEST_GAS), data_apdx_sub)
+  ]
+
+setup(**kwargs)
