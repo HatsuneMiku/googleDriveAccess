@@ -1,4 +1,6 @@
 ./.ref/
 ./dist/
 ./build/
+*.pyc
 MANIFEST
+cache_folderIds.sl3
