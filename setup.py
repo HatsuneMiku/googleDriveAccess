@@ -68,13 +68,13 @@ if os.name != 'nt':
   apdx_dir = '/opt/%s' % (PKG_TITLE, ) # setup as data_files
   pkg_apdx = []
 else: # to avlid SandboxViolation on mkdir
-  apdx_dir = 'test/%s' % (PKG_TITLE, ) # setup as package_data
+  apdx_dir = 'conf/%s' % (PKG_TITLE, ) # setup as package_data
   #pkg_apdx = map(lambda a: '%s/%s' % (apdx_dir, a), data_apdx + data_apdx_sub)
   pkg_apdx = []
 
 package_data = {
   PKG_TITLE: [
-    'test/test.txt'
+    'conf/setup.cf'
   ] + pkg_apdx
 }
 

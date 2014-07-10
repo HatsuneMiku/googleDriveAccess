@@ -39,7 +39,7 @@ OAUTH_SCOPE = __conf__[2:]
 CICACHE_FILE = 'cicache.txt'
 CLIENT_FILE = 'client_secret_%s.json.enc'
 CREDENTIAL_FILE = 'credentials_%s.json.enc'
-CACHE_FOLDERIDS = 'cache_folderIds.sl3'
+CACHE_FOLDERIDS = 'cache_folderIds_%s.sl3'
 MAX_CID_LEN = 256
 MAX_KEY_LEN = 256
 MAX_PATH_LEN = 1024
@@ -151,7 +151,7 @@ class DAClient(object):
     self.drive_service = None
     if self.clientId is None:
       self.clientId = readClientId(self.basedir)
-    self.folderIds = os.path.join(self.basedir, CACHE_FOLDERIDS)
+    self.folderIds = os.path.join(self.basedir, CACHE_FOLDERIDS % self.clientId)
     self.initializeCacheFolderIds()
     if not firstonly:
       if self.second_authorize() is None:

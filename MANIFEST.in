@@ -15,4 +15,4 @@ include script_import_export/test_GoogleAppsScript_createCalendarEvent/*
 include recursive_upload_backup/*
 include recursive_upload_backup/_1234567890/*
 include recursive_upload_backup/abcdefg/*
-include googleDriveAccess/test/*
+include googleDriveAccess/conf/*
