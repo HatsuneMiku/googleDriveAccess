@@ -39,7 +39,10 @@ pkg_requirements = map(lambda a: a.split('>')[0],
   open('requirements.txt', 'rb').read().splitlines())
 
 data_apdx = [
+  'MANIFEST.in',
+  '.gitignore',
   'README.md',
+  'pre_convert_md_rst_html.py',
   'requirements.txt',
   'cicache.txt',
   'client_secret_CLIENT_ID.json.enc',

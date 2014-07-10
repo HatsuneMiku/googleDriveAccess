@@ -2,5 +2,6 @@
 ./dist/
 ./build/
 *.pyc
+pre/README.html
 MANIFEST
 cache_folderIds.sl3
