@@ -1,1 +1,5 @@
-create branch 0.0.9
+0.0.9
+# 'drive.scripts' must be first (OAuth2 SCOPE list starts from the third line)
+https://www.googleapis.com/auth/drive.scripts
+https://www.googleapis.com/auth/drive
+https://www.googleapis.com/auth/calendar
