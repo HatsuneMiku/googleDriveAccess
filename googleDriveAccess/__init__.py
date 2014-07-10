@@ -7,7 +7,7 @@ Google Drive SDK: Searching for files
 https://www.youtube.com/watch?v=DOSvQmQK_HA
 '''
 
-__version__ = '0.0.8'
+__version__ = '0.0.9'
 __url__ = 'https://github.com/HatsuneMiku/googleDriveAccess'
 __author__ = '999hatsune'
 __author_email__ = '999hatsune@gmail.com'
