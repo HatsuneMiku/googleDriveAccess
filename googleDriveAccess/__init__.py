@@ -7,12 +7,17 @@ Google Drive SDK: Searching for files
 https://www.youtube.com/watch?v=DOSvQmQK_HA
 '''
 
-__version__ = '0.0.9'
+import sys, os
+
+def getConf(conf_file):
+  return open(conf_file, 'rb').read().splitlines()
+
+__conf__ = getConf(os.path.join(os.path.dirname(__file__), 'conf/setup.cf'))
+__version__ = __conf__[0]
 __url__ = 'https://github.com/HatsuneMiku/googleDriveAccess'
 __author__ = '999hatsune'
 __author_email__ = '999hatsune@gmail.com'
 
-import sys, os
 import sqlite3
 import getpass
 import random
@@ -29,9 +34,7 @@ from oauth2client.anyjson import simplejson
 
 import logging
 
-OAUTH_SCOPE = [
-  'https://www.googleapis.com/auth/drive',
-  'https://www.googleapis.com/auth/drive.scripts']
+OAUTH_SCOPE = __conf__[2:]
 
 CICACHE_FILE = 'cicache.txt'
 CLIENT_FILE = 'client_secret_%s.json.enc'
@@ -160,7 +163,7 @@ class DAClient(object):
     d = readJsonClient(self.basedir, pid, self.clientId)
     cli = simplejson.loads(d)['installed']
     # print cli
-    scope = OAUTH_SCOPE[0] if not self.script else ' '.join(OAUTH_SCOPE)
+    scope = ' '.join(OAUTH_SCOPE[(1 if not self.script else 0):])
     flow = OAuth2WebServerFlow(cli['client_id'], cli['client_secret'],
       scope, redirect_uri=cli['redirect_uris'][0])
     authorize_url = flow.step1_get_authorize_url()
