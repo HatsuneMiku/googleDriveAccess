@@ -43,11 +43,12 @@
 
 <p>a Python tool to Access to the Google Drive</p>
 
+<p>Package Documentation <a href="https://github.com/HatsuneMiku/googleDriveAccess/wiki">https://github.com/HatsuneMiku/googleDriveAccess/wiki</a></p>
+
 <h2>
 <a name="sample" class="anchor" href="#sample"><span class="octicon octicon-link"></span></a>Sample</h2>
 
-<div class="highlight highlight-python"><pre>
-<span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight highlight-python"><pre><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">googleDriveAccess</span>
 
 <span class="c"># create instance</span>
@@ -60,59 +61,89 @@
 <span class="c"># recursive backup to remote folder</span>
 <span class="n">da</span><span class="o">.</span><span class="n">recursiveUpload</span><span class="p">(</span><span class="s">'a_local_directory_you_want_to_backup_recursively'</span><span class="p">)</span>
 
+<span class="c"># search</span>
+<span class="n">da</span><span class="o">.</span><span class="n">execQuery</span><span class="p">(</span><span class="s">"explicitlyTrashed=True"</span><span class="p">)</span>
+<span class="n">da</span><span class="o">.</span><span class="n">execQuery</span><span class="p">(</span><span class="s">"'root' in parents"</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s">'maxResults'</span><span class="p">:</span> <span class="mi">5</span><span class="p">})</span>
+<span class="n">da</span><span class="o">.</span><span class="n">execQuery</span><span class="p">(</span><span class="s">"'root' in parents and explicitlyTrashed=True"</span><span class="p">,</span> <span class="n">repeattoken</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s">'maxResults'</span><span class="p">:</span> <span class="mi">500</span><span class="p">})</span>
 </pre></div>
 
 <h2>
 <a name="how-to-use-it" class="anchor" href="#how-to-use-it"><span class="octicon octicon-link"></span></a>How to use it</h2>
 
-<div class="highlight highlight-sh"><pre>
-pip install <span class="s1">'google-api-python-client'</span>
+<p>Install</p>
+
+<div class="highlight highlight-bash"><pre>pip install <span class="s1">'google-api-python-client'</span>
 pip install googleDriveAccess
 <span class="nb">cd</span> /opt/googleDriveAccess
+</pre></div>
 
-<span class="c"># register your App on https://console.developers.google.com/project</span>
-<span class="c"># and *'download JSON'* of your Client ID and Client secret</span>
+<p>First, create your Client_ID and secret on the Google Drive.</p>
 
-<span class="c"># rename this JSON file to './client_secret_[Client ID].json'</span>
+<p>Register your App on <a href="https://console.developers.google.com/project">https://console.developers.google.com/project</a>
+and <em>'download JSON'</em> of your Client ID and Client secret.</p>
 
-<span class="c"># create './cicache.txt' file and write your Client ID to the first line.</span>
+<p>Rename this JSON file to './client_secret_[Client ID].json' .</p>
 
-<span class="c"># execute ./encrypt_client_secret.py to encrypt downloaded JSON file</span>
-./encrypt_client_secret.py
+<div class="highlight highlight-bash"><pre>mv client_secrets.json /opt/googleDriveAccess/client_secret_YOURCLIENTID.json
+</pre></div>
 
-<span class="c"># check that encrypted file exists './client_secret_[Client ID].json.enc'</span>
-<span class="c"># and plain text JSON file './client_secret_[Client ID].json' will be deleted</span>
+<p>Second, create cache file for Client ID .</p>
 
-<span class="c"># execute ./test_upload_first.py to test OAuth2 flow and store credentials</span>
-./test_upload_first.py
+<p>Create './cicache.txt' file and write your Client ID to the first line.</p>
 
-<span class="c"># execute ./test_upload_second.py to test OAuth2 using stored credentials</span>
-./test_upload_second.py
+<div class="highlight highlight-bash"><pre><span class="nb">echo </span>YOURCLIENTID &gt; ./cicache.txt
+</pre></div>
 
-<span class="c"># execute ./test_script_prefetch.py to test Drive API search with query</span>
-./test_script_prefetch.py
+<p>Third, encrypt secret file.</p>
 
-<span class="c"># edit test_script_import_export.py (set 'mode = 0')</span>
-<span class="c"># to test create new Google Apps Script</span>
-<span class="c"># 'test_GoogleAppsScript_createCalendarEvent' for tests below</span>
+<p>Execute ./encrypt_client_secret.py to encrypt downloaded JSON file.</p>
 
-<span class="c"># execute ./test_script_import_export.py to test create and *'get SCRIPT_ID'*</span>
-./test_script_import_export.py
+<div class="highlight highlight-bash"><pre>./encrypt_client_secret.py
+</pre></div>
 
-<span class="c"># edit test_script_import_export.py (set 'mode = 2' and *'set SCRIPT_ID'*)</span>
-<span class="c"># to test download</span>
+<p>Check that encrypted file exists './client_secret_[Client ID].json.enc'
+and plain text JSON file './client_secret_[Client ID].json' will be deleted.</p>
 
-<span class="c"># execute ./test_script_import_export.py to test download</span>
-./test_script_import_export.py
+<p>Execute ./test_upload_first.py to test OAuth2 flow and store credentials.</p>
 
-<span class="c"># edit downloaded script</span>
-<span class="c"># './script_import_export/test_GoogleAppsScript_createCalendarEvent/Code.gs'</span>
+<div class="highlight highlight-bash"><pre>./test_upload_first.py
+</pre></div>
 
-<span class="c"># edit test_script_import_export.py (set 'mode = 1') to test upload</span>
+<p>Execute ./test_upload_second.py to test OAuth2 using stored credentials.</p>
 
-<span class="c"># execute ./test_script_import_export.py to test upload</span>
-./test_script_import_export.py
+<div class="highlight highlight-bash"><pre>./test_upload_second.py
+</pre></div>
 
+<p>Execute ./test_script_prefetch.py to test Drive API search with query.</p>
+
+<div class="highlight highlight-bash"><pre>./test_script_prefetch.py
+</pre></div>
+
+<p>Edit test_script_import_export.py (set 'mode = 0')
+to test create new Google Apps Script
+'test_GoogleAppsScript_createCalendarEvent' for tests below.</p>
+
+<p>Execute ./test_script_import_export.py to test create and <em>'get SCRIPT_ID'</em> .</p>
+
+<div class="highlight highlight-bash"><pre>./test_script_import_export.py
+</pre></div>
+
+<p>Edit test_script_import_export.py (set 'mode = 2' and <em>'set SCRIPT_ID'</em>)
+to test download.</p>
+
+<p>Execute ./test_script_import_export.py to test download.</p>
+
+<div class="highlight highlight-bash"><pre>./test_script_import_export.py
+</pre></div>
+
+<p>Edit downloaded script
+'./script_import_export/test_GoogleAppsScript_createCalendarEvent/Code.gs' .</p>
+
+<p>Edit test_script_import_export.py (set 'mode = 1') to test upload.</p>
+
+<p>Execute ./test_script_import_export.py to test upload.</p>
+
+<div class="highlight highlight-bash"><pre>./test_script_import_export.py
 </pre></div>
 
 <h2>
@@ -120,27 +151,25 @@ pip install googleDriveAccess
 
 <p>I will make refresh_cache.py :</p>
 
-<pre><code>
-This program will cache each folder (or file) ids
+<pre><code>This program will cache each folder (or file) ids
 assigned by the Google Drive (into the cache file cache_folderIds.sl3) .
 Please search and erase a row that has same id from the cache file
 when you delete your folder or file using another Google Drive client tool.
-
 </code></pre>
 
 <p>It may be fixed:</p>
 
-<pre><code>
-When uploading a file that would not be automaticaly handled Google Drive,
+<pre><code>When uploading a file that would not be automaticaly handled Google Drive,
 "Media type 'None' is not supported. Valid media types: [*/*]"
 error occurred.
 Because of default mimeType is set to None on uploadFile.
 So it may correct to catch the exception and retry with 'binary/octet-stream'.
-
 </code></pre>
 
 <h2>
 <a name="links" class="anchor" href="#links"><span class="octicon octicon-link"></span></a>Links</h2>
+
+<p>Package Documentation <a href="https://github.com/HatsuneMiku/googleDriveAccess/wiki">https://github.com/HatsuneMiku/googleDriveAccess/wiki</a></p>
 
 <p>You can get the latest version at this GitHub repository.
 <a href="https://github.com/HatsuneMiku/googleDriveAccess">https://github.com/HatsuneMiku/googleDriveAccess</a></p>
