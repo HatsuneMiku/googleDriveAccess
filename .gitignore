@@ -4,4 +4,4 @@
 *.pyc
 pre/README.html
 MANIFEST
-cache_folderIds.sl3
+cache_folderIds_*.sl3

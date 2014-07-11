@@ -38,6 +38,7 @@ Install
 ``` bash
 pip install 'google-api-python-client'
 pip install googleDriveAccess
+  (or easy_install googleDriveAccess)
 cd /opt/googleDriveAccess
 ```
 
@@ -135,8 +136,8 @@ Known BUGs
 I will make refresh_cache.py :
 
 ```
-This program will cache each folder (or file) ids
-assigned by the Google Drive (into the cache file cache_folderIds.sl3) .
+This program will cache each folder (or file) ids assigned by the Google Drive.
+(Into the cache file cache_folderIds_[Client ID].sl3 .)
 Please search and erase a row that has same id from the cache file
 when you delete your folder or file using another Google Drive client tool.
 ```
