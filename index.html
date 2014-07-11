@@ -74,6 +74,7 @@
 
 <div class="highlight highlight-bash"><pre>pip install <span class="s1">'google-api-python-client'</span>
 pip install googleDriveAccess
+  <span class="o">(</span>or easy_install googleDriveAccess<span class="o">)</span>
 <span class="nb">cd</span> /opt/googleDriveAccess
 </pre></div>
 
@@ -151,8 +152,8 @@ to test download.</p>
 
 <p>I will make refresh_cache.py :</p>
 
-<pre><code>This program will cache each folder (or file) ids
-assigned by the Google Drive (into the cache file cache_folderIds.sl3) .
+<pre><code>This program will cache each folder (or file) ids assigned by the Google Drive.
+(Into the cache file cache_folderIds_[Client ID].sl3 .)
 Please search and erase a row that has same id from the cache file
 when you delete your folder or file using another Google Drive client tool.
 </code></pre>
