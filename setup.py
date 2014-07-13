@@ -42,6 +42,7 @@ data_apdx = [
   'MANIFEST.in',
   '.gitignore',
   'README.md',
+  'mkdoc.py',
   'pre_convert_md_rst_html.py',
   'requirements.txt',
   'cicache.txt',
