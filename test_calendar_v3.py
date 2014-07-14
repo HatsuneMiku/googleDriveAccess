@@ -13,9 +13,14 @@ TEST_TITLE = u'test 予定 python api' # unicode
 TZ = 'Asia/Tokyo' # or may be '+09:00' is ok, but can not use string 'JST-9'
 
 def isoTime(t):
+  # dt = time.strftime('%Y-%m-%dT%H:%M:%S+00:00', time.gmtime(t))
   # dt = time.strftime('%Y-%m-%dT%H:%M:%S+09:00', time.localtime(t))
   dt = time.strftime('%Y-%m-%dT%H:%M:%S', time.localtime(t)) # assume TZ
   return {'dateTime': dt, 'timeZone': TZ}
+
+def isoDate(t):
+  dt = time.strftime('%Y-%m-%dT%H:%M:%S+00:00', time.gmtime(t))
+  return {'date': dt[:10]}
 
 da = googleDriveAccess.DAClient(os.path.abspath('.'))
 calendar_service = build('calendar', 'v3', http=da.http)
@@ -27,7 +32,7 @@ for cal in cals['items']:
 print u'================================================================'
 id = cals['items'][0]['id']
 evt1 = { # date only
-  'start': {'date': '2014-07-14'}, 'end': {'date': '2014-07-15'},
+  'start': isoDate(time.time()), 'end': isoDate(time.time() + 24 * 3600),
   'location': u'皇居', 'summary': TEST_TITLE} # unicode
 evtObj = calendar_service.events().insert(calendarId=id, body=evt1).execute()
 # pprint.pprint(evtObj)
