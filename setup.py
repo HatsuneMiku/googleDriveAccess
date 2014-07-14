@@ -50,6 +50,7 @@ data_apdx = [
   'credentials_CLIENT_ID.json.enc',
   'encrypt_client_secret.py',
   'recursive_upload.py',
+  'test_calendar_v3.py',
   'test_folder_create.py',
   'test_folder_hierarchy.py',
   'test_script_import_export.py',

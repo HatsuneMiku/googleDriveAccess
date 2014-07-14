@@ -148,6 +148,7 @@ class DAClient(object):
     self.script = script
     self.printFields = ['modifiedDate', 'title', 'id', 'mimeType']
     self.printCallback = self.defaultPrintCallback
+    self.http = None
     self.drive_service = None
     if self.clientId is None:
       self.clientId = readClientId(self.basedir)
@@ -188,8 +189,8 @@ class DAClient(object):
     if credentials is None:
       return None
     # Connect to Google Drive
-    http = credentials.authorize(httplib2.Http())
-    self.drive_service = build('drive', 'v2', http=http)
+    self.http = credentials.authorize(httplib2.Http())
+    self.drive_service = build('drive', 'v2', http=self.http)
     if self.drive_service is None:
       return None
     return self.drive_service
