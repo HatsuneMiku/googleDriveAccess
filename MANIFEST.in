@@ -1,9 +1,8 @@
 include MANIFEST.in
 include .gitignore
 include README.md
+include mkdoc.py
 include pre_convert_md_rst_html.py
-include pre/*
-include pre/css/*
 include requirements.txt
 include cicache.txt
 include *_CLIENT_ID.json.enc

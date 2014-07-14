@@ -3,7 +3,7 @@ googleDriveAccess
 
 a Python tool to Access to the Google Drive
 
-Package Documentation https://github.com/HatsuneMiku/googleDriveAccess/wiki
+Package Documentation https://github.com/HatsuneMiku/googleDriveAccess/wiki/module_googleDriveAccess
 
 
 Sample
@@ -157,7 +157,7 @@ So it may correct to catch the exception and retry with 'binary/octet-stream'.
 Links
 -----
 
-Package Documentation https://github.com/HatsuneMiku/googleDriveAccess/wiki
+Package Documentation https://github.com/HatsuneMiku/googleDriveAccess/wiki/module_googleDriveAccess
 
 You can get the latest version at this GitHub repository.
 https://github.com/HatsuneMiku/googleDriveAccess

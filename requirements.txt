@@ -1,3 +1,5 @@
+make_GitHub_wiki_tree>=0.0.8
+make_GitHub_doc_PyPI>=0.0.4
 httplib2>=0.8
 pycrypto>=2.3
 simplejson>=3.3.1

@@ -42,6 +42,7 @@ data_apdx = [
   'MANIFEST.in',
   '.gitignore',
   'README.md',
+  'mkdoc.py',
   'pre_convert_md_rst_html.py',
   'requirements.txt',
   'cicache.txt',
@@ -49,6 +50,7 @@ data_apdx = [
   'credentials_CLIENT_ID.json.enc',
   'encrypt_client_secret.py',
   'recursive_upload.py',
+  'test_calendar_v3.py',
   'test_folder_create.py',
   'test_folder_hierarchy.py',
   'test_script_import_export.py',
@@ -58,18 +60,32 @@ data_apdx = [
   'test_document.txt'
 ]
 
-TEST_GAS = 'script_import_export/test_GoogleAppsScript_createCalendarEvent'
-data_apdx_sub = map(lambda a: '%s/%s' % (TEST_GAS, a), [
+R_APDX = [('script_import_export/test_GoogleAppsScript_createCalendarEvent', [
   'Code.gs',
   'manifest.json'
-])
+])]
+R_APDX += [('recursive_upload_backup', [
+  'test.test',
+  'test.txt.enc'
+])]
+R_APDX += [('%s/%s' % (R_APDX[1][0], '_1234567890'), [
+  'test0000.txt',
+  'test0001.txt'
+])]
+R_APDX += [('%s/%s' % (R_APDX[1][0], 'abcdefg'), [
+  'test0006.txt'
+])]
+data_r_apdx = [map(lambda a: '%s/%s' % (t[0], a), t[1]) for t in R_APDX]
 
 if os.name != 'nt':
   apdx_dir = '/opt/%s' % (PKG_TITLE, ) # setup as data_files
   pkg_apdx = []
 else: # to avlid SandboxViolation on mkdir
   apdx_dir = 'conf/%s' % (PKG_TITLE, ) # setup as package_data
-  #pkg_apdx = map(lambda a: '%s/%s' % (apdx_dir, a), data_apdx + data_apdx_sub)
+  '''
+  pkg_apdx = map(lambda a: '%s/%s' % (apdx_dir, a),
+    reduce(lambda a, b: a + b, data_r_apdx, data_apdx))
+  '''
   pkg_apdx = []
 
 package_data = {
@@ -115,9 +131,8 @@ kwargs = {
 }
 
 if os.name != 'nt':
-  kwargs['data_files'] = [
-    (apdx_dir, data_apdx),
-    ('%s/%s' % (apdx_dir, TEST_GAS), data_apdx_sub)
-  ]
+  kwargs['data_files'] = reduce(
+    lambda a, b: a + [('%s/%s' % (apdx_dir, R_APDX[b][0]), data_r_apdx[b])],
+    range(len(R_APDX)), [(apdx_dir, data_apdx)])
 
 setup(**kwargs)
