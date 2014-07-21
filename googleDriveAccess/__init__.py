@@ -24,6 +24,8 @@ import random
 import hashlib
 from Crypto.Cipher import AES
 from StringIO import StringIO
+import base64
+import bz2
 
 import httplib2
 from apiclient.discovery import build
@@ -67,8 +69,7 @@ def get_key_iv(passwd, salt):
 
 def buf_AES_256_CBC_decrypt(inbuf, outbuf, passwd):
   if inbuf.read(8) != 'Salted__':
-    print 'header Salted__ is not found'
-    return
+    raise Exception('header Salted__ is not found')
   salt = inbuf.read(8)
   key, iv = get_key_iv(passwd, salt)
   a256c = AES.new(key, AES.MODE_CBC, iv)
@@ -78,7 +79,7 @@ def buf_AES_256_CBC_decrypt(inbuf, outbuf, passwd):
     outbuf.write(dat[:-pad])
   else:
     outbuf.write(dat)
-    print 'padding may be incorrect'
+    raise Exception('padding may be incorrect')
   outbuf.seek(0)
 
 def buf_AES_256_CBC_encrypt(inbuf, outbuf, passwd):
@@ -114,10 +115,10 @@ def readJsonCredential(basedir, pid, clientId):
   f.close()
   dec = StringIO()
   buf_AES_256_CBC_decrypt(enc, dec, pid)
-  return dec.read()
+  return bz2.decompress(dec.read())
 
 def storeJsonCredential(basedir, pid, clientId, jsonStr):
-  dec = StringIO(jsonStr)
+  dec = StringIO(bz2.compress(jsonStr))
   enc = StringIO()
   buf_AES_256_CBC_encrypt(dec, enc, pid)
   f = open(os.path.join(basedir, CREDENTIAL_FILE % clientId), 'wb')

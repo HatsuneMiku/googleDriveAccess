@@ -10,13 +10,17 @@ from apiclient.discovery import build
 import pprint
 
 TEST_TITLE = u'test 予定 python api' # unicode
+# you may use pytz.timezone() and datetime.datetime.now(pytz.utc)
 TZ = 'Asia/Tokyo' # or may be '+09:00' is ok, but can not use string 'JST-9'
 
 def isoTime(t):
-  # dt = time.strftime('%Y-%m-%dT%H:%M:%S+00:00', time.gmtime(t))
-  # dt = time.strftime('%Y-%m-%dT%H:%M:%S+09:00', time.localtime(t))
-  dt = time.strftime('%Y-%m-%dT%H:%M:%S', time.localtime(t)) # assume TZ
-  return {'dateTime': dt, 'timeZone': TZ}
+  if False: # returns no 'timeZone' to use locale timezone of google calendar ?
+    dt = time.strftime('%Y-%m-%dT%H:%M:%S+00:00', time.gmtime(t))
+    return {'dateTime': dt}
+  else:
+    # dt = time.strftime('%Y-%m-%dT%H:%M:%S+09:00', time.localtime(t))
+    dt = time.strftime('%Y-%m-%dT%H:%M:%S', time.localtime(t)) # assume TZ
+    return {'dateTime': dt, 'timeZone': TZ}
 
 def isoDate(t):
   dt = time.strftime('%Y-%m-%dT%H:%M:%S+00:00', time.gmtime(t))
