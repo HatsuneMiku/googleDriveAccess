@@ -47,13 +47,17 @@ def sendMsg(act, gmu, sender, to, subject, body, attach=None):
   msg['to'] = to
   msg['subject'] = subject
   mbd = {'raw': base64.b64encode(msg.as_string())}
-  # userId may be set 'me' that means same as OAuth2 act.
-  kwargs = {'userId': act, 'body': mbd}
   try:
     print 'account: %s' % act
+    # userId may be set 'me' that means same as OAuth2 act.
+    kwargs = {'userId': act, 'body': mbd}
     mobj = gmu.messages().send(**kwargs).execute()
     pprint.pprint(mobj)
-    print 'MessageId: %s' % mobj['id']
+    print 'MessageId: %s - labels %s' % (mobj['id'], mobj['labelIds'])
+    lbl = {'removeLabelIds': [], 'addLabelIds': ['INBOX', 'UNREAD', 'STARRED']}
+    kwargs = {'userId': act, 'id': mobj['id'], 'body': lbl}
+    mobj = gmu.messages().modify(**kwargs).execute()
+    print 'MessageId: %s - labels %s' % (mobj['id'], mobj['labelIds'])
   except (errors.HttpError, ), e:
     pprint.pprint(e)
 
