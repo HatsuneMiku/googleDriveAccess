@@ -12,6 +12,7 @@ Sample
 ``` python
 import os
 import googleDriveAccess
+from apiclient.discovery import build
 
 # create instance
 da = googleDriveAccess.DAClient(os.path.abspath('.'))
@@ -27,6 +28,18 @@ da.recursiveUpload('a_local_directory_you_want_to_backup_recursively')
 da.execQuery("explicitlyTrashed=True")
 da.execQuery("'root' in parents", **{'maxResults': 5})
 da.execQuery("'root' in parents and explicitlyTrashed=True", repeattoken=True, **{'maxResults': 500})
+
+# OAuth2
+oauth2_service = build('oauth2', 'v2', http=da.http)
+ui = oauth2_service.userinfo().get().execute()
+act = ui['email']
+print act
+
+# gmail
+gmail_service = build('gmail', 'v1', http=da.http)
+gmu = gmail_service.users()
+sendMsg(act, gmu, act, act, 'message title', 'message text')
+sendMsg(act, gmu, act, act, 'title attach', 'text attach', 'test_document.txt')
 ```
 
 
