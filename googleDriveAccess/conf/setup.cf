@@ -1,5 +1,10 @@
-0.0.10
+0.0.11
 # 'drive.scripts' must be first (OAuth2 SCOPE list starts from the third line)
 https://www.googleapis.com/auth/drive.scripts
 https://www.googleapis.com/auth/drive
 https://www.googleapis.com/auth/calendar
+https://www.googleapis.com/auth/userinfo.profile
+https://www.googleapis.com/auth/userinfo.email
+https://www.googleapis.com/auth/gmail.readonly
+https://www.googleapis.com/auth/gmail.modify
+https://www.googleapis.com/auth/gmail.compose
