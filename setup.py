@@ -20,7 +20,8 @@ PKG_URL = mdl.__url__
 AUTHOR = mdl.__author__
 AUTHOR_EMAIL = mdl.__author_email__
 PKG_KWD = '''\
-google drive googledrive recursive upload backup import export apps script'''
+GAE google app engine client api OAuth2 gmail mail calendar drive googledrive \
+recursive upload backup import export apps script'''
 PKG_DSC = '''\
 recursive upload to Google Drive and \
 import-export Google Apps Script source code'''
@@ -50,6 +51,7 @@ data_apdx = [
   'credentials_CLIENT_ID.json.enc',
   'encrypt_client_secret.py',
   'recursive_upload.py',
+  'test_gmail_v1.py',
   'test_calendar_v3.py',
   'test_folder_create.py',
   'test_folder_hierarchy.py',

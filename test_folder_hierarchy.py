@@ -7,7 +7,7 @@ import sys, os
 import socket
 
 from oauth2client.anyjson import simplejson
-import googleDriveAccess
+import googleDriveAccess as gda
 
 import logging
 logging.basicConfig()
@@ -70,7 +70,7 @@ def proc_iter(outf, epaths, edirs, efiles, topdown=True):
   if not topdown: outfiles(outf, efiles, spc, joinedepaths)
 
 def main(basedir):
-  da = googleDriveAccess.DAClient(basedir) # clientId=None, script=False
+  da = gda.DAClient(basedir) # clientId=None, script=False
 
   f = open(os.path.join(basedir, 'hierarchy_topdown.txt'), 'wb')
   walk(da, 'root', f, ('', ))

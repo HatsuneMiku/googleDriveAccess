@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 '''test_upload_second
-OAuth2 and save / load credentials to / from 'credentials.json.enc'
+OAuth2 and save / load credentials to / from 'credentials_CI_OA2ACT.json.enc'
 Apps Script Crash Course: Import/Export Apps Script Code
 https://www.youtube.com/watch?v=lEVMu9KE6jk
 '''
@@ -11,7 +11,7 @@ import socket
 import pprint
 
 from apiclient.http import MediaFileUpload
-import googleDriveAccess
+import googleDriveAccess as gda
 
 import logging
 logging.basicConfig()
@@ -19,8 +19,8 @@ logging.basicConfig()
 FILENAME = 'test_document.txt'
 
 def upload_file(basedir, filename, mimetype, description):
-  da = googleDriveAccess.DAClient(basedir, script=True) # clientId=None
-  drive_service = da.drive_service
+  da = gda.DAClient(basedir, script=True) # clientId=None
+  drive_service = da.service
 
   # Upload a file
   body = {'title': filename, 'mimeType': mimetype, 'description': description}

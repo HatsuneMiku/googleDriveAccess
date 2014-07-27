@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 '''test_script_import_export
-OAuth2 'credentials_CI.json.enc'
+OAuth2 'credentials_CI_OA2ACT.json.enc'
 Apps Script Crash Course: Import/Export Apps Script Code
 https://www.youtube.com/watch?v=lEVMu9KE6jk
 Google Drive SDK: Searching for files
@@ -18,7 +18,7 @@ import sys, os
 import socket
 import pprint
 
-import googleDriveAccess
+import googleDriveAccess as gda
 
 import logging
 logging.basicConfig()
@@ -29,7 +29,7 @@ SCRIPT_NAME = 'test_GoogleAppsScript_createCalendarEvent'
 
 def main(basedir):
   folder = os.path.join(basedir, SCRIPT_FOLDER)
-  das = googleDriveAccess.DAScript(basedir, folder) # clientId=None
+  das = gda.DAScript(basedir, folder) # clientId=None
   mode = 0 # 0: create, 1: upload, 2: download
   if mode == 0: id, fileobj = das.upload(None, SCRIPT_NAME, create=True)
   elif mode == 1: id, fileobj = das.upload(SCRIPT_ID, SCRIPT_NAME)

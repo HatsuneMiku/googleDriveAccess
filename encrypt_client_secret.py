@@ -9,14 +9,14 @@ read CI from cicache.txt
 import sys, os
 import socket
 import getpass
-import googleDriveAccess
+import googleDriveAccess as gda
 import logging
 logging.basicConfig()
 
 CLIENT_SECRET = 'client_secret'
 
 def encrypt_client_secret(basedir):
-  ci = googleDriveAccess.readClientId(basedir)
+  ci = gda.readClientId(basedir)
   cs = os.path.join(basedir, '%s_%s.json' % (CLIENT_SECRET, ci))
   if not os.path.exists(cs):
     sys.stderr.write('file does not exists: %s' % cs)
@@ -25,8 +25,8 @@ def encrypt_client_secret(basedir):
   j = f.read()
   f.close()
   print 'encrypt %s_CI.json to %s_CI.json.enc' % (CLIENT_SECRET, CLIENT_SECRET)
-  pid = googleDriveAccess.getpass2()
-  googleDriveAccess.storeJsonClient(basedir, pid, ci, j)
+  pid = gda.getpass2()
+  gda.storeJsonClient(basedir, pid, ci, j)
   ecs = '%s.enc' % cs
   if os.path.exists(ecs):
     os.remove(cs)
