@@ -13,7 +13,7 @@ import sys, os
 import socket
 import pprint
 
-import googleDriveAccess
+import googleDriveAccess as gda
 
 import logging
 logging.basicConfig()
@@ -22,7 +22,7 @@ FOLDER_TEST = 'this_is_a_test_folder'
 FOLDER_NAME = 'GoogleAppsScript_demo'
 
 def main(basedir):
-  da = googleDriveAccess.DAClient(basedir) # clientId=None, script=False
+  da = gda.DAClient(basedir) # clientId=None, script=False
   id, folder = da.createFolder(FOLDER_TEST) # parentId='root'
   pprint.pprint(folder)
   print 'FOLDER_ID=%s [%s]' % (id, folder['title'])

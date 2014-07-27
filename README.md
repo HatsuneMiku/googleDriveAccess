@@ -1,7 +1,7 @@
 googleDriveAccess
 =================
 
-a Python tool to Access to the Google Drive
+a Python tool to Access to the Google Drive ( OAuth2, Calendar, Gmail, etc )
 
 Package Documentation https://github.com/HatsuneMiku/googleDriveAccess/wiki/module_googleDriveAccess
 
@@ -11,11 +11,10 @@ Sample
 
 ``` python
 import os
-import googleDriveAccess
-from apiclient.discovery import build
+import googleDriveAccess as gda
 
 # create instance
-da = googleDriveAccess.DAClient(os.path.abspath('.'))
+da = gda.DAClient(os.path.abspath('.'))
 
 # create parent folders at the same time
 folderId, folderPath = da.makeDirs('/remote_drive/subfolder_test/subsubfolder')
@@ -30,16 +29,36 @@ da.execQuery("'root' in parents", **{'maxResults': 5})
 da.execQuery("'root' in parents and explicitlyTrashed=True", repeattoken=True, **{'maxResults': 500})
 
 # OAuth2
-oauth2_service = build('oauth2', 'v2', http=da.http)
-ui = oauth2_service.userinfo().get().execute()
+oa2 = gda.OAuth2Client(abc=da)
+ui = oa2.userInfo()
 act = ui['email']
 print act
 
 # gmail
-gmail_service = build('gmail', 'v1', http=da.http)
-gmu = gmail_service.users()
-sendMsg(act, gmu, act, act, 'message title', 'message text')
-sendMsg(act, gmu, act, act, 'title attach', 'text attach', 'test_document.txt')
+gm = gda.GmailClient(abc=oa2)
+mo = gm.sendMsg(act, act, 'message title', 'message text')
+if mo:
+  mo = gm.modifyLabels(mo['id'], addLabels=['INBOX', 'UNREAD', 'STARRED'])
+mo = gm.sendMsg(act, act, 'title attach', 'text attach', 'test_document.txt')
+if mo:
+  mo = gm.modifyLabels(mo['id'], addLabels=['INBOX', 'UNREAD', 'STARRED'])
+
+# calendar
+import time
+ca = gda.CalendarClient('Asia/Tokyo', abc=oa2)
+cals = ca.idList()
+for cal in cals['items']:
+  print u'%s : %s' % (cal['id'], cal['summary']) # unicode
+id = cals['items'][0]['id']
+print id
+TEST_TITLE = u'今日の待ち合わせ' # unicode
+t = time.time()
+eo = ca.insertEvent(id,
+  start=ca.isoDate(t), end=ca.isoDate(t + 24 * 3600), # date only
+  location=u'皇居', summary=TEST_TITLE) # unicode
+eo = ca.insertEvent(id
+  start=ca.isoTime(t + 1800), end=ca.isoTime(t + 3600), # date and time
+  location=u'京都御所', summary=TEST_TITLE) # unicode
 ```
 
 
@@ -103,6 +122,20 @@ Execute ./test_upload_second.py to test OAuth2 using stored credentials.
 ```
 
 
+Execute ./test_calendar_v3.py to test OAuth2 and add calendar event.
+
+``` bash
+./test_calendar_v3.py
+```
+
+
+Execute ./test_gmail_v1.py to test OAuth2 and send mail and modify labels.
+
+``` bash
+./test_gmail_v1.py
+```
+
+
 Execute ./test_script_prefetch.py to test Drive API search with query.
 
 ``` bash
@@ -146,11 +179,18 @@ Execute ./test_script_import_export.py to test upload.
 Known BUGs
 ----------
 
+Fails to create and update Google Apps Script.
+
+```
+mimeType was changed about specification of uploading Google Apps Script ?
+```
+
+
 I will make refresh_cache.py :
 
 ```
 This program will cache each folder (or file) ids assigned by the Google Drive.
-(Into the cache file cache_folderIds_[Client ID].sl3 .)
+(Into the cache file cache_folderIds_[Client ID]_[OAuth2Act].sl3 .)
 Please search and erase a row that has same id from the cache file
 when you delete your folder or file using another Google Drive client tool.
 ```
@@ -178,6 +218,14 @@ https://github.com/HatsuneMiku/googleDriveAccess
 GitHub HomePage http://hatsunemiku.github.io/googleDriveAccess
 
 PyPI https://pypi.python.org/pypi/googleDriveAccess
+
+
+Relations
+---------
+
+pytz-memcache https://github.com/HatsuneMiku/pytz-memcache
+
+pytz-memcache (PyPI) https://pypi.python.org/pypi/pytz-memcache
 
 
 License

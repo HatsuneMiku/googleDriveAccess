@@ -8,7 +8,7 @@ But you should upload them into an archive (.tar.gz).
 import sys, os
 import socket
 
-import googleDriveAccess
+import googleDriveAccess as gda
 
 import logging
 logging.basicConfig()
@@ -16,7 +16,7 @@ logging.basicConfig()
 BACKUP = 'recursive_upload_backup'
 
 def main(basedir):
-  da = googleDriveAccess.DAClient(basedir)
+  da = gda.DAClient(basedir)
   da.recursiveUpload(BACKUP)
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 '''test_script_prefetch
-OAuth2 'credentials_CI.json.enc'
+OAuth2 'credentials_CI_OA2ACT.json.enc'
 Apps Script Crash Course: Import/Export Apps Script Code
 https://www.youtube.com/watch?v=lEVMu9KE6jk
 Google Drive SDK: Searching for files
@@ -16,7 +16,7 @@ import sys, os
 import pprint
 
 from oauth2client.anyjson import simplejson
-import googleDriveAccess
+import googleDriveAccess as gda
 
 import logging
 logging.basicConfig()
@@ -26,7 +26,7 @@ SCRIPT_TYPE = 'application/vnd.google-apps.script+json'
 
 logging.getLogger().setLevel(getattr(logging, 'INFO'))
 basedir = os.path.abspath('.')
-da = googleDriveAccess.DAClient(basedir, script=True) # clientId=None
+da = gda.DAClient(basedir, script=True) # clientId=None
 
 q = "'root' in parents"
 e = da.execQuery(q, noprint=True) # default maxResults=100
@@ -68,7 +68,7 @@ e = da.execQuery("mimeType='%s'" % SCRIPT_TYPE[:-5])
 # pprint.pprint(e['items'][0]['mimeType']) # application/vnd.google-apps.script
 
 download_url = e['items'][0]['exportLinks'][SCRIPT_TYPE]
-resp, content = da.drive_service._http.request(download_url)
+resp, content = da.service._http.request(download_url)
 if resp.status != 200: raise Exception('An error occurred: %s' % resp)
 data = simplejson.loads(content)
 
