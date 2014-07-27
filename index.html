@@ -41,7 +41,7 @@
         <h1>
 <a name="googledriveaccess" class="anchor" href="#googledriveaccess"><span class="octicon octicon-link"></span></a>googleDriveAccess</h1>
 
-<p>a Python tool to Access to the Google Drive</p>
+<p>a Python tool to Access to the Google Drive ( OAuth2, Calendar, Gmail, etc )</p>
 
 <p>Package Documentation <a href="https://github.com/HatsuneMiku/googleDriveAccess/wiki/module_googleDriveAccess">https://github.com/HatsuneMiku/googleDriveAccess/wiki/module_googleDriveAccess</a></p>
 
@@ -49,10 +49,10 @@
 <a name="sample" class="anchor" href="#sample"><span class="octicon octicon-link"></span></a>Sample</h2>
 
 <div class="highlight highlight-python"><pre><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">googleDriveAccess</span>
+<span class="kn">import</span> <span class="nn">googleDriveAccess</span> <span class="kn">as</span> <span class="nn">gda</span>
 
 <span class="c"># create instance</span>
-<span class="n">da</span> <span class="o">=</span> <span class="n">googleDriveAccess</span><span class="o">.</span><span class="n">DAClient</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s">'.'</span><span class="p">))</span>
+<span class="n">da</span> <span class="o">=</span> <span class="n">gda</span><span class="o">.</span><span class="n">DAClient</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s">'.'</span><span class="p">))</span>
 
 <span class="c"># create parent folders at the same time</span>
 <span class="n">folderId</span><span class="p">,</span> <span class="n">folderPath</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">makeDirs</span><span class="p">(</span><span class="s">'/remote_drive/subfolder_test/subsubfolder'</span><span class="p">)</span>
@@ -65,6 +65,38 @@
 <span class="n">da</span><span class="o">.</span><span class="n">execQuery</span><span class="p">(</span><span class="s">"explicitlyTrashed=True"</span><span class="p">)</span>
 <span class="n">da</span><span class="o">.</span><span class="n">execQuery</span><span class="p">(</span><span class="s">"'root' in parents"</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s">'maxResults'</span><span class="p">:</span> <span class="mi">5</span><span class="p">})</span>
 <span class="n">da</span><span class="o">.</span><span class="n">execQuery</span><span class="p">(</span><span class="s">"'root' in parents and explicitlyTrashed=True"</span><span class="p">,</span> <span class="n">repeattoken</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s">'maxResults'</span><span class="p">:</span> <span class="mi">500</span><span class="p">})</span>
+
+<span class="c"># OAuth2</span>
+<span class="n">oa2</span> <span class="o">=</span> <span class="n">gda</span><span class="o">.</span><span class="n">OAuth2Client</span><span class="p">(</span><span class="n">abc</span><span class="o">=</span><span class="n">da</span><span class="p">)</span>
+<span class="n">ui</span> <span class="o">=</span> <span class="n">oa2</span><span class="o">.</span><span class="n">userInfo</span><span class="p">()</span>
+<span class="n">act</span> <span class="o">=</span> <span class="n">ui</span><span class="p">[</span><span class="s">'email'</span><span class="p">]</span>
+<span class="k">print</span> <span class="n">act</span>
+
+<span class="c"># gmail</span>
+<span class="n">gm</span> <span class="o">=</span> <span class="n">gda</span><span class="o">.</span><span class="n">GmailClient</span><span class="p">(</span><span class="n">abc</span><span class="o">=</span><span class="n">oa2</span><span class="p">)</span>
+<span class="n">mo</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">sendMsg</span><span class="p">(</span><span class="n">act</span><span class="p">,</span> <span class="n">act</span><span class="p">,</span> <span class="s">'message title'</span><span class="p">,</span> <span class="s">'message text'</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">mo</span><span class="p">:</span>
+  <span class="n">mo</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">modifyLabels</span><span class="p">(</span><span class="n">mo</span><span class="p">[</span><span class="s">'id'</span><span class="p">],</span> <span class="n">addLabels</span><span class="o">=</span><span class="p">[</span><span class="s">'INBOX'</span><span class="p">,</span> <span class="s">'UNREAD'</span><span class="p">,</span> <span class="s">'STARRED'</span><span class="p">])</span>
+<span class="n">mo</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">sendMsg</span><span class="p">(</span><span class="n">act</span><span class="p">,</span> <span class="n">act</span><span class="p">,</span> <span class="s">'title attach'</span><span class="p">,</span> <span class="s">'text attach'</span><span class="p">,</span> <span class="s">'test_document.txt'</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">mo</span><span class="p">:</span>
+  <span class="n">mo</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">modifyLabels</span><span class="p">(</span><span class="n">mo</span><span class="p">[</span><span class="s">'id'</span><span class="p">],</span> <span class="n">addLabels</span><span class="o">=</span><span class="p">[</span><span class="s">'INBOX'</span><span class="p">,</span> <span class="s">'UNREAD'</span><span class="p">,</span> <span class="s">'STARRED'</span><span class="p">])</span>
+
+<span class="c"># calendar</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="n">ca</span> <span class="o">=</span> <span class="n">gda</span><span class="o">.</span><span class="n">CalendarClient</span><span class="p">(</span><span class="s">'Asia/Tokyo'</span><span class="p">,</span> <span class="n">abc</span><span class="o">=</span><span class="n">oa2</span><span class="p">)</span>
+<span class="n">cals</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">idList</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">cal</span> <span class="ow">in</span> <span class="n">cals</span><span class="p">[</span><span class="s">'items'</span><span class="p">]:</span>
+  <span class="k">print</span> <span class="s">u'</span><span class="si">%s</span><span class="s"> : </span><span class="si">%s</span><span class="s">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">cal</span><span class="p">[</span><span class="s">'id'</span><span class="p">],</span> <span class="n">cal</span><span class="p">[</span><span class="s">'summary'</span><span class="p">])</span> <span class="c"># unicode</span>
+<span class="nb">id</span> <span class="o">=</span> <span class="n">cals</span><span class="p">[</span><span class="s">'items'</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">'id'</span><span class="p">]</span>
+<span class="k">print</span> <span class="nb">id</span>
+<span class="n">TEST_TITLE</span> <span class="o">=</span> <span class="s">u'今日の待ち合わせ'</span> <span class="c"># unicode</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">eo</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">insertEvent</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span>
+  <span class="n">start</span><span class="o">=</span><span class="n">ca</span><span class="o">.</span><span class="n">isoDate</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="n">ca</span><span class="o">.</span><span class="n">isoDate</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">3600</span><span class="p">),</span> <span class="c"># date only</span>
+  <span class="n">location</span><span class="o">=</span><span class="s">u'皇居'</span><span class="p">,</span> <span class="n">summary</span><span class="o">=</span><span class="n">TEST_TITLE</span><span class="p">)</span> <span class="c"># unicode</span>
+<span class="n">eo</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">insertEvent</span><span class="p">(</span><span class="nb">id</span>
+  <span class="n">start</span><span class="o">=</span><span class="n">ca</span><span class="o">.</span><span class="n">isoTime</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1800</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="n">ca</span><span class="o">.</span><span class="n">isoTime</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">3600</span><span class="p">),</span> <span class="c"># date and time</span>
+  <span class="n">location</span><span class="o">=</span><span class="s">u'京都御所'</span><span class="p">,</span> <span class="n">summary</span><span class="o">=</span><span class="n">TEST_TITLE</span><span class="p">)</span> <span class="c"># unicode</span>
 </pre></div>
 
 <h2>
@@ -115,6 +147,16 @@ and plain text JSON file './client_secret_[Client ID].json' will be deleted.</p>
 <div class="highlight highlight-bash"><pre>./test_upload_second.py
 </pre></div>
 
+<p>Execute ./test_calendar_v3.py to test OAuth2 and add calendar event.</p>
+
+<div class="highlight highlight-bash"><pre>./test_calendar_v3.py
+</pre></div>
+
+<p>Execute ./test_gmail_v1.py to test OAuth2 and send mail and modify labels.</p>
+
+<div class="highlight highlight-bash"><pre>./test_gmail_v1.py
+</pre></div>
+
 <p>Execute ./test_script_prefetch.py to test Drive API search with query.</p>
 
 <div class="highlight highlight-bash"><pre>./test_script_prefetch.py
@@ -150,10 +192,15 @@ to test download.</p>
 <h2>
 <a name="known-bugs" class="anchor" href="#known-bugs"><span class="octicon octicon-link"></span></a>Known BUGs</h2>
 
+<p>Fails to create and update Google Apps Script.</p>
+
+<pre><code>mimeType was changed about specification of uploading Google Apps Script ?
+</code></pre>
+
 <p>I will make refresh_cache.py :</p>
 
 <pre><code>This program will cache each folder (or file) ids assigned by the Google Drive.
-(Into the cache file cache_folderIds_[Client ID].sl3 .)
+(Into the cache file cache_folderIds_[Client ID]_[OAuth2Act].sl3 .)
 Please search and erase a row that has same id from the cache file
 when you delete your folder or file using another Google Drive client tool.
 </code></pre>
@@ -178,6 +225,13 @@ So it may correct to catch the exception and retry with 'binary/octet-stream'.
 <p>GitHub HomePage <a href="http://hatsunemiku.github.io/googleDriveAccess">http://hatsunemiku.github.io/googleDriveAccess</a></p>
 
 <p>PyPI <a href="https://pypi.python.org/pypi/googleDriveAccess">https://pypi.python.org/pypi/googleDriveAccess</a></p>
+
+<h2>
+<a name="relations" class="anchor" href="#relations"><span class="octicon octicon-link"></span></a>Relations</h2>
+
+<p>pytz-memcache <a href="https://github.com/HatsuneMiku/pytz-memcache">https://github.com/HatsuneMiku/pytz-memcache</a></p>
+
+<p>pytz-memcache (PyPI) <a href="https://pypi.python.org/pypi/pytz-memcache">https://pypi.python.org/pypi/pytz-memcache</a></p>
 
 <h2>
 <a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
