@@ -56,7 +56,7 @@ t = time.time()
 eo = ca.insertEvent(id,
   start=ca.isoDate(t), end=ca.isoDate(t + 24 * 3600), # date only
   location=u'皇居', summary=TEST_TITLE) # unicode
-eo = ca.insertEvent(id
+eo = ca.insertEvent(id,
   start=ca.isoTime(t + 1800), end=ca.isoTime(t + 3600), # date and time
   location=u'京都御所', summary=TEST_TITLE) # unicode
 ```
