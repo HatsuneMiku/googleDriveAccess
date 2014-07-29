@@ -21,9 +21,6 @@ __author_email__ = '999hatsune@gmail.com'
 import time
 import sqlite3
 import getpass
-import random
-import hashlib
-from Crypto.Cipher import AES
 from StringIO import StringIO
 import base64
 import bz2
@@ -35,6 +32,8 @@ from apiclient import errors
 from oauth2client.client import OAuth2WebServerFlow, OAuth2Credentials
 from oauth2client.anyjson import simplejson
 # import simplejson
+
+from buf_AES_256_CBC import buf_AES_256_CBC_decrypt, buf_AES_256_CBC_encrypt
 
 import logging
 
@@ -62,38 +61,6 @@ def storeClientId(basedir, ci):
   f = open(os.path.join(basedir, CICACHE_FILE), 'wb')
   f.write(ci)
   f.close()
-
-def get_key_iv(passwd, salt):
-  h = [''] * 3
-  for i in range(len(h)):
-    h[i] = hashlib.md5((h[i - 1] if i else '') + passwd + salt).digest()
-  return h[0] + h[1], h[2]
-
-def buf_AES_256_CBC_decrypt(inbuf, outbuf, passwd):
-  if inbuf.read(8) != 'Salted__':
-    raise Exception('header Salted__ is not found')
-  salt = inbuf.read(8)
-  key, iv = get_key_iv(passwd, salt)
-  a256c = AES.new(key, AES.MODE_CBC, iv)
-  dat = a256c.decrypt(inbuf.read())
-  pad = ord(dat[-1])
-  if 1 <= pad <= 16:
-    outbuf.write(dat[:-pad])
-  else:
-    outbuf.write(dat)
-    raise Exception('padding may be incorrect')
-  outbuf.seek(0)
-
-def buf_AES_256_CBC_encrypt(inbuf, outbuf, passwd):
-  outbuf.write('Salted__')
-  salt = ''.join(chr(random.randint(0, 0xFF)) for _ in range(8))
-  outbuf.write(salt)
-  key, iv = get_key_iv(passwd, salt)
-  a256c = AES.new(key, AES.MODE_CBC, iv)
-  dat = inbuf.read()
-  pad = 16 - (len(dat) % 16) # pad should be never 0, so remove them later 1-16
-  outbuf.write(a256c.encrypt(dat + (chr(pad) * pad)))
-  outbuf.seek(0)
 
 def readJsonClient(basedir, pid, clientId):
   f = open(os.path.join(basedir, CLIENT_FILE % clientId), 'rb')
