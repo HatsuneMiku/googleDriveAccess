@@ -66,3 +66,38 @@ class GmailClient(AbstractClient):
       return gmu.messages().modify(**kwargs).execute()
     except (errors.HttpError, ), e:
       print e # pprint.pprint(e)
+
+  def getMsgEntries(self, **kwargs):
+    '''
+    maxResults: messages count par a result separated by token
+    '''
+    gmu = self.service.users()
+    kwargs['userId'] = self.oa2act
+    return gmu.messages().list(**kwargs).execute()
+
+  def getMsg(self, msgid, fmt=0):
+    '''
+    msgid: message id
+    fmt: format number
+    '''
+    fmts = ['full', 'minimal', 'raw']
+    gmu = self.service.users()
+    kwargs = {'userId': self.oa2act, 'id': msgid, 'format': fmts[fmt]}
+    return gmu.messages().get(**kwargs).execute()
+
+  def getHdrsList(self, msgObj):
+    return msgObj['payload']['headers']
+
+  def getHdrsDict(self, msgObj):
+    return dict(map(lambda a: (a['name'].lower(), (a['name'], a['value'])),
+      self.getHdrsList(msgObj)))
+
+  def trimWidth(self, s, m=72):
+    from unicodedata import east_asian_width
+    L = {'Na': 1, 'W': 2, 'F': 2, 'H': 1, 'A': 2, 'N': 1}
+    u, w = [], 0
+    for c in s:
+      w += L[east_asian_width(c)]
+      if w > m: break
+      u.append(c)
+    return u''.join(u)

@@ -42,6 +42,13 @@ if mo:
 mo = gm.sendMsg(act, act, 'title attach', 'text attach', 'test_document.txt')
 if mo:
   mo = gm.modifyLabels(mo['id'], addLabels=['INBOX', 'UNREAD', 'STARRED'])
+msgs = gm.getMsgEntries(maxResults=3)
+for msg in msgs['messages']:
+  mo = gm.getMsg(msg['id'])
+  hdrs = gm.getHdrsDict(mo)
+  for k in ('date', 'to', 'from', 'subject'):
+    if k in hdrs: print u'%s: %s' % hdrs[k] # unicode
+  print u'snippet: %s' % gm.trimWidth(mo['snippet'], 70) # unicode
 
 # calendar
 import time
