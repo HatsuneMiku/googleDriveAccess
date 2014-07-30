@@ -39,14 +39,11 @@ def main(basedir):
 
   for cal in cals['items']:
     print u'=' * 64
-    entries = ca.service.events().list(calendarId=cal['id']).execute()
+    entries = ca.eventList(cal['id'])
     # pprint.pprint(entries)
     print u'entry : %s' % (entries['summary']) # unicode
     for ev in entries['items']:
-      if 'date' in ev['start']:
-        s, e = ev['start']['date'], ev['end']['date'] # date only
-      else:
-        s, e = ev['start']['dateTime'], ev['end']['dateTime'] # date and time
+      b, s, e = ca.startend(ev)
       print u'%s : %s : %s' % (s, e, ev['summary']) # unicode
       if ev['summary'] == TEST_TITLE: # unicode
         pprint.pprint(ev)

@@ -269,12 +269,13 @@ class DAClient(AbstractClient):
   srv_version = 'v2'
 
   def __init__(self, basedir=None, **kwargs):
-    self.folderIds = None
+    self.folderIds = None # will be set in DAClient.build()
     super(DAClient, self).__init__(basedir, **kwargs)
     self.printFields = ['modifiedDate', 'title', 'id', 'mimeType']
     self.printCallback = self.defaultPrintCallback
 
   def build(self, http):
+    '''will be called by AbstractClient.__init__()'''
     super(DAClient, self).build(http)
     self.folderIds = os.path.join(self.basedir,
       CACHE_FOLDERIDS % (self.clientId, self.safe_fname(self.oa2act)))
@@ -613,8 +614,17 @@ class CalendarClient(AbstractClient):
     dt = time.strftime('%Y-%m-%dT%H:%M:%S', time.localtime(t)) # assume TZ
     return {'date': dt[:10]}
 
+  def startend(self, ev):
+    if 'date' in ev['start']: # date only
+      return (True, ev['start']['date'], ev['end']['date'])
+    else: # date and time
+      return (False, ev['start']['dateTime'], ev['end']['dateTime'])
+
   def idList(self):
     return self.service.calendarList().list().execute()
+
+  def eventList(self, id):
+    return self.service.events().list(calendarId=id).execute()
 
   def insertEvent(self, id, **kwargs):
     '''
