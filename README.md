@@ -42,6 +42,13 @@ if mo:
 mo = gm.sendMsg(act, act, 'title attach', 'text attach', 'test_document.txt')
 if mo:
   mo = gm.modifyLabels(mo['id'], addLabels=['INBOX', 'UNREAD', 'STARRED'])
+msgs = gm.getMsgEntries(maxResults=3)
+for msg in msgs['messages']:
+  mo = gm.getMsg(msg['id'])
+  hdrs = gm.getHdrsDict(mo)
+  for k in ('date', 'to', 'from', 'subject'):
+    if k in hdrs: print u'%s: %s' % hdrs[k] # unicode
+  print u'snippet: %s' % gm.trimWidth(mo['snippet'], 70) # unicode
 
 # calendar
 import time
@@ -51,12 +58,12 @@ for cal in cals['items']:
   print u'%s : %s' % (cal['id'], cal['summary']) # unicode
 id = cals['items'][0]['id']
 print id
-TEST_TITLE = u'今日の待ち合わせ' # unicode
+TEST_TITLE = u'rendez-vous 今日の待ち合わせ' # unicode
 t = time.time()
 eo = ca.insertEvent(id,
   start=ca.isoDate(t), end=ca.isoDate(t + 24 * 3600), # date only
   location=u'皇居', summary=TEST_TITLE) # unicode
-eo = ca.insertEvent(id
+eo = ca.insertEvent(id,
   start=ca.isoTime(t + 1800), end=ca.isoTime(t + 3600), # date and time
   location=u'京都御所', summary=TEST_TITLE) # unicode
 ```

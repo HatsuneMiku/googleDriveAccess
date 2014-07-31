@@ -23,8 +23,8 @@ PKG_KWD = '''\
 GAE google app engine client api OAuth2 gmail mail calendar drive googledrive \
 recursive upload backup import export apps script'''
 PKG_DSC = '''\
-recursive upload to Google Drive and \
-import-export Google Apps Script source code'''
+recursive upload to Google Drive ( supports OAuth2, Calendar, Gmail, etc ) \
+and import-export Google Apps Script source code'''
 
 PYPI_PKGSRC = 'https://pypi.python.org/packages/source'
 PYPI_DLURL = '%s/%c/%s/%s-%s.tar.gz' % (

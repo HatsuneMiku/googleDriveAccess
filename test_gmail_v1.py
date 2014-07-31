@@ -31,6 +31,17 @@ def main(basedir):
     print 'MessageId: %s - labels %s' % (mo['id'], mo['labelIds'])
     mo = gm.modifyLabels(mo['id'], addLabels=['INBOX', 'UNREAD', 'STARRED'])
     print 'MessageId: %s - labels %s' % (mo['id'], mo['labelIds'])
+  msgs = gm.getMsgEntries(maxResults=3)
+  # pprint.pprint(msgs)
+  for msg in msgs['messages']:
+    # pprint.pprint(msg['threadId'])
+    # pprint.pprint(msg['id'])
+    mo = gm.getMsg(msg['id'])
+    hdrs = gm.getHdrsDict(mo)
+    for k in ('date', 'to', 'from', 'subject'):
+      if k in hdrs: print u'%s: %s' % hdrs[k] # unicode
+    print u'snippet: %s' % gm.trimWidth(mo['snippet'], 70) # unicode
+    # pprint.pprint(mo)
 
 if __name__ == '__main__':
   logging.getLogger().setLevel(getattr(logging, 'INFO')) # ERROR
