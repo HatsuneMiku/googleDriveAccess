@@ -129,6 +129,27 @@ Execute ./test_upload_second.py to test OAuth2 using stored credentials.
 ```
 
 
+Execute ./test_folder_create.py to test OAuth2 and create folders.
+
+``` bash
+./test_folder_create.py
+```
+
+
+Execute ./test_folder_hierarchy.py to test OAuth2 and scan folders.
+
+``` bash
+./test_folder_hierarchy.py
+```
+
+
+Execute ./recursive_upload.py to test OAuth2 and upload files.
+
+``` bash
+./recursive_upload.py
+```
+
+
 Execute ./test_calendar_v3.py to test OAuth2 and add calendar event.
 
 ``` bash
