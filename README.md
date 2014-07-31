@@ -58,7 +58,7 @@ for cal in cals['items']:
   print u'%s : %s' % (cal['id'], cal['summary']) # unicode
 id = cals['items'][0]['id']
 print id
-TEST_TITLE = u'今日の待ち合わせ' # unicode
+TEST_TITLE = u'rendez-vous 今日の待ち合わせ' # unicode
 t = time.time()
 eo = ca.insertEvent(id,
   start=ca.isoDate(t), end=ca.isoDate(t + 24 * 3600), # date only
