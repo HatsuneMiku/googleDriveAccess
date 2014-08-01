@@ -1,7 +1,8 @@
 googleDriveAccess
 =================
 
-a Python tool to Access to the Google Drive ( OAuth2, Calendar, Gmail, etc )
+a Python tool to Access to the Google Drive
+( OAuth2, Calendar, Gmail, geocoding, etc )
 
 Package Documentation https://github.com/HatsuneMiku/googleDriveAccess/wiki/module_googleDriveAccess
 
@@ -71,6 +72,14 @@ eo = ca.insertEvent(id,
 eo = ca.insertEvent(id,
   start=ca.isoTime(t + 1800), end=ca.isoTime(t + 3600), # date and time
   location=u'京都御所', summary=TEST_TITLE) # unicode
+
+# geocoding
+geo = gda.GeocodingClient('ja', u'日本')
+print geo.getLatLng(u'福井県敦賀市明神町')
+print geo.getLocation(35.75, 136.02)
+geo.ignoreCountryHead = False
+print geo.getLocation(*geo.getLatLng(u'福井県敦賀市明神町'))
+print geo.getLatLng(geo.getLocation(35.75, 136.02))
 ```
 
 

@@ -31,9 +31,10 @@ from da_client import DAClient
 from da_script import DAScript
 from calendar_client import CalendarClient
 from gmail_client import GmailClient
+from geocoding_client import GeocodingClient
 
 __all__ = ['get_key_iv', 'buf_AES_256_CBC_decrypt', 'buf_AES_256_CBC_encrypt',
   'readClientId', 'storeClientId', 'readJsonClient', 'storeJsonClient',
   'readJsonCredential', 'storeJsonCredential', 'getpass2',
   'AbstractClient', 'OAuth2Client', 'DAClient', 'DAScript',
-  'CalendarClient', 'GmailClient']
+  'CalendarClient', 'GmailClient', 'GeocodingClient']
