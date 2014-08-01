@@ -28,6 +28,9 @@ da.execQuery("explicitlyTrashed=True")
 da.execQuery("'root' in parents", **{'maxResults': 5})
 da.execQuery("'root' in parents and explicitlyTrashed=True", repeattoken=True, **{'maxResults': 500})
 
+# download (change fileId and correct mimeType 'application/octet-stream' etc.)
+da.downloadFile('/tmp', 'test_document.txt', 'FILE_ID_TO_GET', 'text/plain')
+
 # OAuth2
 oa2 = gda.OAuth2Client(abc=da)
 ui = oa2.userInfo()
@@ -126,6 +129,13 @@ Execute ./test_upload_second.py to test OAuth2 using stored credentials.
 
 ``` bash
 ./test_upload_second.py
+```
+
+
+Execute ./test_download_third.py to test OAuth2 using stored credentials.
+
+``` bash
+./test_download_third.py
 ```
 
 

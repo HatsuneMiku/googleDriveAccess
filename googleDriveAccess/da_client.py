@@ -255,3 +255,31 @@ insert into folderIds (key, val, act, fol, flg) values (?, ?, ?, ?, ?);''', (
         print 'F %s %s' % (q, f) # os.path.join(path, f)
         fileId, fileObj = self.process_file(path, f, p_id, q)
         # pprint.pprint((fileId, fileObj))
+
+  def downloadFile(self, path, filename, fileId, mimetype=None):
+    '''
+    path: putput path
+    filename: output filename
+    fileId: get it
+    mimetype: no operation (mimetype conversion will be implemented future)
+    '''
+    from apiclient import errors
+    try:
+      fileObj = self.service.files().get(fileId=fileId).execute()
+    except (errors.HttpError, ), e:
+      fileObj = None
+    if fileObj:
+      download_url = fileObj.get('downloadUrl', None)
+      if download_url:
+        resp, content = self.service._http.request(download_url)
+        if resp.status == 200:
+          f = open(os.path.join(path, filename), 'wb')
+          f.write(content)
+          f.close()
+        else:
+          sys.stderr.write('an error occurred: %s %s\n' % (resp, download_url))
+      else:
+        sys.stderr.write('not found downloadUrl for fileId: %s\n' % fileId)
+    else:
+      sys.stderr.write('not found fileId: %s\n' % fileId)
+    return (fileObj.get('id', None) if fileObj else None, fileObj)
