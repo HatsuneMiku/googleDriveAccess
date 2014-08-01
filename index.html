@@ -89,6 +89,8 @@
   <span class="n">hdrs</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">getHdrsDict</span><span class="p">(</span><span class="n">mo</span><span class="p">)</span>
   <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s">'date'</span><span class="p">,</span> <span class="s">'to'</span><span class="p">,</span> <span class="s">'from'</span><span class="p">,</span> <span class="s">'subject'</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">hdrs</span><span class="p">:</span> <span class="k">print</span> <span class="s">u'</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">'</span> <span class="o">%</span> <span class="n">hdrs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="c"># unicode</span>
+  <span class="c"># popup message from calendar may contain u'\xbb'</span>
+  <span class="c">#print u'snippet: %s' % gm.trimWidth(mo['snippet'].replace(u'\xbb', u'&gt;'), 70)</span>
   <span class="k">print</span> <span class="s">u'snippet: </span><span class="si">%s</span><span class="s">'</span> <span class="o">%</span> <span class="n">gm</span><span class="o">.</span><span class="n">trimWidth</span><span class="p">(</span><span class="n">mo</span><span class="p">[</span><span class="s">'snippet'</span><span class="p">],</span> <span class="mi">70</span><span class="p">)</span> <span class="c"># unicode</span>
 
 <span class="c"># calendar</span>
