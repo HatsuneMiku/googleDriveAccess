@@ -256,18 +256,35 @@ insert into folderIds (key, val, act, fol, flg) values (?, ?, ?, ?, ?);''', (
         fileId, fileObj = self.process_file(path, f, p_id, q)
         # pprint.pprint((fileId, fileObj))
 
-  def downloadFile(self, path, filename, fileId, mimetype=None):
+  def downloadFile(self, path, filename, parentId, fileId=None, mimetype=None):
     '''
-    path: putput path
+    path: output path
     filename: output filename
-    fileId: get it
-    mimetype: no operation (mimetype conversion will be implemented future)
+    parentId: parentId of file (ignored when parentId=None or fileId is set)
+    fileId: fileId to get (if None: search by filename and parentId)
+    mimetype: search mimetype (type conversion will be implemented future)
     '''
     from apiclient import errors
-    try:
-      fileObj = self.service.files().get(fileId=fileId).execute()
-    except (errors.HttpError, ), e:
-      fileObj = None
+    if fileId is None:
+      fileInfo = (filename, mimetype)
+      q = "title contains '%s'" % filename
+      if parentId: q = "%s and '%s' in parents" % (q, parentId)
+      if mimetype: q = "%s and mimeType='%s'" % (q, mimetype)
+      entries = self.execQuery(q, noprint=True, maxResults=2)
+      cnt = len(entries['items'])
+      if not cnt:
+        sys.stderr.write('not found [%s] mimeType[%s]\n' % fileInfo)
+        return (None, None)
+      if cnt > 1:
+        sys.stderr.write('duplicated [%s] mimeType[%s]\a\n' % fileInfo)
+      # pprint.pprint(entries)
+      fileObj = entries['items'][0]
+      fileId = fileObj['id']
+    else:
+      try:
+        fileObj = self.service.files().get(fileId=fileId).execute()
+      except (errors.HttpError, ), e:
+        fileObj = None
     if fileObj:
       download_url = fileObj.get('downloadUrl', None)
       if download_url:

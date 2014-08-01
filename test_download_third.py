@@ -17,23 +17,41 @@ logging.basicConfig()
 
 FILENAME = 'test_document.txt'
 
-def download_file(basedir, filename, mimetype):
-  da = gda.DAClient(basedir, script=True) # clientId=None
-  fileinfo = (filename, mimetype)
-  q = "title contains '%s' and mimeType='%s'" % fileinfo
-  entries = da.execQuery(q, noprint=True, maxResults=2)
-  cnt = len(entries['items'])
-  if not cnt:
-    sys.stderr.write('not found [%s] %s\n' % fileinfo)
-    return
-  if cnt > 1:
-    sys.stderr.write('duplicated [%s] %s\a\n' % fileinfo)
-  # pprint.pprint(entries)
-  fileObj = entries['items'][0]
+def print_file((fileId, fileObj)):
+  # pprint.pprint(fileObj)
+  # print u'id: %s' % fileId
   for k in ('id', 'mimeType', 'title', 'description'):
     print u'%s: %s' % (k, fileObj[k])
-  fileId, fileObj = da.downloadFile(basedir, filename, fileObj['id'], mimetype)
-  print u'id: %s' % fileId
+
+def download_file(basedir, filename, mimetype):
+  da = gda.DAClient(basedir, script=True) # clientId=None
+
+  # 101 test search mimetype in parent
+  fileInfo = da.downloadFile(basedir, filename, 'root', mimetype=mimetype)
+  print_file(fileInfo)
+
+  # 001 test search mimetype
+  print_file(da.downloadFile(basedir, filename, None, mimetype=mimetype))
+
+  fileId = fileInfo[0]
+
+  # 111 test fileId (ignore) mimetype in parent
+  print_file(da.downloadFile(basedir, filename, 'root', fileId, mimetype))
+
+  # 011 test fileId (ignore) mimetype
+  print_file(da.downloadFile(basedir, filename, None, fileId, mimetype))
+
+  # 110 test fileId (ignore) in parent
+  print_file(da.downloadFile(basedir, filename, 'root', fileId))
+
+  # 010 test fileId
+  print_file(da.downloadFile(basedir, filename, None, fileId))
+
+  # 100 test search in parent
+  print_file(da.downloadFile(basedir, filename, parentId='root'))
+
+  # 000 test search
+  print_file(da.downloadFile(basedir, filename, parentId=None))
 
 def main(basedir):
   download_file(basedir, FILENAME, 'text/plain')
