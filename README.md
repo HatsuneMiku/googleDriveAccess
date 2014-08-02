@@ -185,6 +185,13 @@ Execute ./test_gmail_v1.py to test OAuth2 and send mail and modify labels.
 ```
 
 
+Execute ./test_geocoding.py to test geocoding.
+
+``` bash
+./test_geocoding.py
+```
+
+
 Execute ./test_script_prefetch.py to test Drive API search with query.
 
 ``` bash
