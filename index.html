@@ -32,7 +32,7 @@
       <section>
         <div id="title">
           <h1>googleDriveAccess</h1>
-          <p>googleDriveAccess is a Python tool to Access to the Google Drive ( OAuth2, Calendar, Gmail, etc ) and upload and download ( import and export ) Google Apps Script source codes</p>
+          <p>googleDriveAccess is a Python tool to Access to the Google Drive ( OAuth2, Calendar, Gmail, geocoding, etc ) and upload and download ( import and export ) Google Apps Script source codes</p>
           <hr>
           <span class="credits left">Project maintained by <a href="https://github.com/HatsuneMiku">HatsuneMiku</a></span>
           <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
@@ -41,7 +41,8 @@
         <h1>
 <a name="googledriveaccess" class="anchor" href="#googledriveaccess"><span class="octicon octicon-link"></span></a>googleDriveAccess</h1>
 
-<p>a Python tool to Access to the Google Drive ( OAuth2, Calendar, Gmail, etc )</p>
+<p>a Python tool to Access to the Google Drive
+( OAuth2, Calendar, Gmail, geocoding, etc )</p>
 
 <p>Package Documentation <a href="https://github.com/HatsuneMiku/googleDriveAccess/wiki/module_googleDriveAccess">https://github.com/HatsuneMiku/googleDriveAccess/wiki/module_googleDriveAccess</a></p>
 
@@ -109,6 +110,14 @@
 <span class="n">eo</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">insertEvent</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span>
   <span class="n">start</span><span class="o">=</span><span class="n">ca</span><span class="o">.</span><span class="n">isoTime</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1800</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="n">ca</span><span class="o">.</span><span class="n">isoTime</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">3600</span><span class="p">),</span> <span class="c"># date and time</span>
   <span class="n">location</span><span class="o">=</span><span class="s">u'京都御所'</span><span class="p">,</span> <span class="n">summary</span><span class="o">=</span><span class="n">TEST_TITLE</span><span class="p">)</span> <span class="c"># unicode</span>
+
+<span class="c"># geocoding</span>
+<span class="n">geo</span> <span class="o">=</span> <span class="n">gda</span><span class="o">.</span><span class="n">GeocodingClient</span><span class="p">(</span><span class="s">'ja'</span><span class="p">,</span> <span class="s">u'日本'</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">geo</span><span class="o">.</span><span class="n">getLatLng</span><span class="p">(</span><span class="s">u'福井県敦賀市明神町'</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">geo</span><span class="o">.</span><span class="n">getLocation</span><span class="p">(</span><span class="mf">35.75</span><span class="p">,</span> <span class="mf">136.02</span><span class="p">)</span>
+<span class="n">geo</span><span class="o">.</span><span class="n">ignoreCountryHead</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="k">print</span> <span class="n">geo</span><span class="o">.</span><span class="n">getLocation</span><span class="p">(</span><span class="o">*</span><span class="n">geo</span><span class="o">.</span><span class="n">getLatLng</span><span class="p">(</span><span class="s">u'福井県敦賀市明神町'</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">geo</span><span class="o">.</span><span class="n">getLatLng</span><span class="p">(</span><span class="n">geo</span><span class="o">.</span><span class="n">getLocation</span><span class="p">(</span><span class="mf">35.75</span><span class="p">,</span> <span class="mf">136.02</span><span class="p">))</span>
 </pre></div>
 
 <h2>
