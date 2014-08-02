@@ -151,43 +151,23 @@ Execute ./test_download_third.py to test OAuth2 using stored credentials.
 
 
 Execute ./test_folder_create.py to test OAuth2 and create folders.
-
-``` bash
-./test_folder_create.py
-```
-
-
 Execute ./test_folder_hierarchy.py to test OAuth2 and scan folders.
-
-``` bash
-./test_folder_hierarchy.py
-```
-
-
 Execute ./recursive_upload.py to test OAuth2 and upload files.
 
 ``` bash
+./test_folder_create.py
+./test_folder_hierarchy.py
 ./recursive_upload.py
 ```
 
 
 Execute ./test_calendar_v3.py to test OAuth2 and add calendar event.
-
-``` bash
-./test_calendar_v3.py
-```
-
-
 Execute ./test_gmail_v1.py to test OAuth2 and send mail and modify labels.
-
-``` bash
-./test_gmail_v1.py
-```
-
-
 Execute ./test_geocoding.py to test geocoding.
 
 ``` bash
+./test_calendar_v3.py
+./test_gmail_v1.py
 ./test_geocoding.py
 ```
 
