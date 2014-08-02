@@ -1,7 +1,8 @@
 googleDriveAccess
 =================
 
-a Python tool to Access to the Google Drive ( OAuth2, Calendar, Gmail, etc )
+a Python tool to Access to the Google Drive
+( OAuth2, Calendar, Gmail, geocoding, etc )
 
 Package Documentation https://github.com/HatsuneMiku/googleDriveAccess/wiki/module_googleDriveAccess
 
@@ -28,6 +29,9 @@ da.execQuery("explicitlyTrashed=True")
 da.execQuery("'root' in parents", **{'maxResults': 5})
 da.execQuery("'root' in parents and explicitlyTrashed=True", repeattoken=True, **{'maxResults': 500})
 
+# download (change fileId and correct mimeType 'application/octet-stream' etc.)
+da.downloadFile('/tmp', 'test_document.txt', parentId='root')
+
 # OAuth2
 oa2 = gda.OAuth2Client(abc=da)
 ui = oa2.userInfo()
@@ -48,6 +52,8 @@ for msg in msgs['messages']:
   hdrs = gm.getHdrsDict(mo)
   for k in ('date', 'to', 'from', 'subject'):
     if k in hdrs: print u'%s: %s' % hdrs[k] # unicode
+  # popup message from calendar may contain u'\xbb'
+  #print u'snippet: %s' % gm.trimWidth(mo['snippet'].replace(u'\xbb', u'>'), 70)
   print u'snippet: %s' % gm.trimWidth(mo['snippet'], 70) # unicode
 
 # calendar
@@ -66,6 +72,14 @@ eo = ca.insertEvent(id,
 eo = ca.insertEvent(id,
   start=ca.isoTime(t + 1800), end=ca.isoTime(t + 3600), # date and time
   location=u'京都御所', summary=TEST_TITLE) # unicode
+
+# geocoding
+geo = gda.GeocodingClient('ja', u'日本')
+print geo.getLatLng(u'福井県敦賀市明神町')
+print geo.getLocation(35.75, 136.02)
+geo.ignoreCountryHead = False
+print geo.getLocation(*geo.getLatLng(u'福井県敦賀市明神町'))
+print geo.getLatLng(geo.getLocation(35.75, 136.02))
 ```
 
 
@@ -129,6 +143,34 @@ Execute ./test_upload_second.py to test OAuth2 using stored credentials.
 ```
 
 
+Execute ./test_download_third.py to test OAuth2 using stored credentials.
+
+``` bash
+./test_download_third.py
+```
+
+
+Execute ./test_folder_create.py to test OAuth2 and create folders.
+
+``` bash
+./test_folder_create.py
+```
+
+
+Execute ./test_folder_hierarchy.py to test OAuth2 and scan folders.
+
+``` bash
+./test_folder_hierarchy.py
+```
+
+
+Execute ./recursive_upload.py to test OAuth2 and upload files.
+
+``` bash
+./recursive_upload.py
+```
+
+
 Execute ./test_calendar_v3.py to test OAuth2 and add calendar event.
 
 ``` bash
@@ -140,6 +182,13 @@ Execute ./test_gmail_v1.py to test OAuth2 and send mail and modify labels.
 
 ``` bash
 ./test_gmail_v1.py
+```
+
+
+Execute ./test_geocoding.py to test geocoding.
+
+``` bash
+./test_geocoding.py
 ```
 
 

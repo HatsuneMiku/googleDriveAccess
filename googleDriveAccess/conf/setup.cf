@@ -1,4 +1,4 @@
-0.1.2
+0.1.3
 # 'drive.scripts' must be first (OAuth2 SCOPE list starts from the third line)
 https://www.googleapis.com/auth/drive.scripts
 https://www.googleapis.com/auth/drive

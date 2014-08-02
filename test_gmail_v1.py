@@ -40,6 +40,8 @@ def main(basedir):
     hdrs = gm.getHdrsDict(mo)
     for k in ('date', 'to', 'from', 'subject'):
       if k in hdrs: print u'%s: %s' % hdrs[k] # unicode
+    # popup message from calendar may contain u'\xbb'
+    #print u'snippet: %s' % gm.trimWidth(mo['snippet'].replace(u'\xbb', u'>'), 70)
     print u'snippet: %s' % gm.trimWidth(mo['snippet'], 70) # unicode
     # pprint.pprint(mo)
 

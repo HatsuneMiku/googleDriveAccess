@@ -21,9 +21,10 @@ AUTHOR = mdl.__author__
 AUTHOR_EMAIL = mdl.__author_email__
 PKG_KWD = '''\
 GAE google app engine client api OAuth2 gmail mail calendar drive googledrive \
-recursive upload backup import export apps script'''
+recursive upload backup import export apps script geocoding'''
 PKG_DSC = '''\
-recursive upload to Google Drive ( supports OAuth2, Calendar, Gmail, etc ) \
+recursive upload to Google Drive \
+( supports OAuth2, Calendar, Gmail, geocoding, etc ) \
 and import-export Google Apps Script source code'''
 
 PYPI_PKGSRC = 'https://pypi.python.org/packages/source'
@@ -51,6 +52,7 @@ data_apdx = [
   'credentials_CLIENT_ID.json.enc',
   'encrypt_client_secret.py',
   'recursive_upload.py',
+  'test_geocoding.py',
   'test_gmail_v1.py',
   'test_calendar_v3.py',
   'test_folder_create.py',
@@ -59,6 +61,7 @@ data_apdx = [
   'test_script_prefetch.py',
   'test_upload_first.py',
   'test_upload_second.py',
+  'test_download_third.py',
   'test_document.txt'
 ]
 

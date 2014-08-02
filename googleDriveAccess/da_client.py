@@ -255,3 +255,48 @@ insert into folderIds (key, val, act, fol, flg) values (?, ?, ?, ?, ?);''', (
         print 'F %s %s' % (q, f) # os.path.join(path, f)
         fileId, fileObj = self.process_file(path, f, p_id, q)
         # pprint.pprint((fileId, fileObj))
+
+  def downloadFile(self, path, filename, parentId, fileId=None, mimetype=None):
+    '''
+    path: output path
+    filename: output filename
+    parentId: parentId of file (ignored when parentId=None or fileId is set)
+    fileId: fileId to get (if None: search by filename and parentId)
+    mimetype: search mimetype (type conversion will be implemented future)
+    '''
+    from apiclient import errors
+    if fileId is None:
+      fileInfo = (filename, mimetype)
+      q = "title contains '%s'" % filename
+      if parentId: q = "%s and '%s' in parents" % (q, parentId)
+      if mimetype: q = "%s and mimeType='%s'" % (q, mimetype)
+      entries = self.execQuery(q, noprint=True, maxResults=2)
+      cnt = len(entries['items'])
+      if not cnt:
+        sys.stderr.write('not found [%s] mimeType[%s]\n' % fileInfo)
+        return (None, None)
+      if cnt > 1:
+        sys.stderr.write('duplicated [%s] mimeType[%s]\a\n' % fileInfo)
+      # pprint.pprint(entries)
+      fileObj = entries['items'][0]
+      fileId = fileObj['id']
+    else:
+      try:
+        fileObj = self.service.files().get(fileId=fileId).execute()
+      except (errors.HttpError, ), e:
+        fileObj = None
+    if fileObj:
+      download_url = fileObj.get('downloadUrl', None)
+      if download_url:
+        resp, content = self.service._http.request(download_url)
+        if resp.status == 200:
+          f = open(os.path.join(path, filename), 'wb')
+          f.write(content)
+          f.close()
+        else:
+          sys.stderr.write('an error occurred: %s %s\n' % (resp, download_url))
+      else:
+        sys.stderr.write('not found downloadUrl for fileId: %s\n' % fileId)
+    else:
+      sys.stderr.write('not found fileId: %s\n' % fileId)
+    return (fileObj.get('id', None) if fileObj else None, fileObj)
