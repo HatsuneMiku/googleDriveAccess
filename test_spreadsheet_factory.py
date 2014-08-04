@@ -28,13 +28,20 @@ def main(basedir):
     # print u'%s : %s' % (cell.title.text, cell.content.text)
     print u'    %4d %4s %3d %3d %8s' % (n, cell.title.text,
       int(cell.cell.row), int(cell.cell.col), cell.content.text)
-  j = -1
+  print u'-' * 72
+  j, c = -1, 0
   for n, cell in enumerate(cells):
     k = int(cell.cell.row) - 1
     if k != j:
       j = k
       if j: sys.stdout.write('\n')
+      c = 0
     # *** will be skipped many cells that has no data ***
+    col = int(cell.cell.col)
+    c += 1
+    while c < col:
+      sys.stdout.write(' ' * 7)
+      c += 1
     sys.stdout.write('%7s' % cell.content.text)
   if j: sys.stdout.write('\n')
 
