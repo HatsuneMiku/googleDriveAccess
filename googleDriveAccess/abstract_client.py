@@ -27,6 +27,7 @@ MAX_PATH_LEN = 1024
 MANIFEST = 'manifest.json'
 SCRIPT_TYPE = 'application/vnd.google-apps.script+json'
 FOLDER_TYPE = 'application/vnd.google-apps.folder'
+SPREADSHEET_TYPE = 'application/vnd.google-apps.spreadsheet'
 
 def readClientId(basedir):
   f = open(os.path.join(basedir, CICACHE_FILE), 'rb')
@@ -106,6 +107,7 @@ class AbstractClient(object):
     if self.abc and not isinstance(self.abc, AbstractClient):
       raise Exception('ancestor of abc must be AbstractClient')
     # for instance
+    self.credentials = self.abc.credentials if self.abc else None
     self.http = self.abc.http if self.abc else None
     self.service = None
 
@@ -122,9 +124,11 @@ class AbstractClient(object):
     if self.firstonly: return
     if self.http:
       if self.build(self.http): return
-    credentials = self.second_authorize()
-    if credentials is None: raise Exception('cannot get credential')
-    self.http = credentials.authorize(httplib2.Http())
+      else: self.credentials = None
+    if self.credentials is None:
+      self.credentials = self.second_authorize()
+    if self.credentials is None: raise Exception('cannot get credential')
+    self.http = self.credentials.authorize(httplib2.Http())
     if self.build(self.http) is None:
       raise Exception('cannot build Client %s %s' % (
         self.srv_name, self.srv_version))

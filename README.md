@@ -2,7 +2,7 @@ googleDriveAccess
 =================
 
 a Python tool to Access to the Google Drive
-( OAuth2, Calendar, Gmail, geocoding, etc )
+( OAuth2, Calendar, Gmail, geocoding, spreadsheet, etc )
 
 Package Documentation https://github.com/HatsuneMiku/googleDriveAccess/wiki/module_googleDriveAccess
 
@@ -80,6 +80,16 @@ print geo.getLocation(35.75, 136.02)
 geo.ignoreCountryHead = False
 print geo.getLocation(*geo.getLatLng(u'福井県敦賀市明神町'))
 print geo.getLatLng(geo.getLocation(35.75, 136.02))
+
+# spreadsheet
+ss = gda.SpreadsheetFactory(abc=oa2)(sheetName='test_spreadsheet_factory')
+print ss.oa2act
+print ss.sheetId
+print ss.sheet()['title']
+for ws in ss.worksheets():
+  print u'%s : %s' % (ws.get_worksheet_id(), ws.title.text)
+for cell in ss.cells():
+  print u'%s : %s' % (cell.title.text, cell.content.text)
 ```
 
 
@@ -151,44 +161,26 @@ Execute ./test_download_third.py to test OAuth2 using stored credentials.
 
 
 Execute ./test_folder_create.py to test OAuth2 and create folders.
-
-``` bash
-./test_folder_create.py
-```
-
-
 Execute ./test_folder_hierarchy.py to test OAuth2 and scan folders.
-
-``` bash
-./test_folder_hierarchy.py
-```
-
-
 Execute ./recursive_upload.py to test OAuth2 and upload files.
 
 ``` bash
+./test_folder_create.py
+./test_folder_hierarchy.py
 ./recursive_upload.py
 ```
 
 
 Execute ./test_calendar_v3.py to test OAuth2 and add calendar event.
+Execute ./test_gmail_v1.py to test OAuth2 and send mail and modify labels.
+Execute ./test_geocoding.py to test geocoding.
+Execute ./test_spreadsheet_factory.py to test OAuth2 and spreadsheet.
 
 ``` bash
 ./test_calendar_v3.py
-```
-
-
-Execute ./test_gmail_v1.py to test OAuth2 and send mail and modify labels.
-
-``` bash
 ./test_gmail_v1.py
-```
-
-
-Execute ./test_geocoding.py to test geocoding.
-
-``` bash
 ./test_geocoding.py
+./test_spreadsheet_factory.py
 ```
 
 
