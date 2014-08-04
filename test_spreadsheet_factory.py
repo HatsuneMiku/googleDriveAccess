@@ -28,6 +28,11 @@ def main(basedir):
     # print u'%s : %s' % (cell.title.text, cell.content.text)
     print u'    %4d %4s %3d %3d %8s' % (n, cell.title.text,
       int(cell.cell.row), int(cell.cell.col), cell.content.text)
+
+  if False: # test skip
+    ss.ssc.update_cell(ss.sheetId, ss.worksheetId, 1, 1, u'日本語表示')
+    ss.ssc.update_cell(ss.sheetId, ss.worksheetId, 3, 3, u'漢字')
+
   print u'-' * 72
   j, c = -1, 0
   for n, cell in enumerate(cells):
