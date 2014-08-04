@@ -21,10 +21,10 @@ AUTHOR = mdl.__author__
 AUTHOR_EMAIL = mdl.__author_email__
 PKG_KWD = '''\
 GAE google app engine client api OAuth2 gmail mail calendar drive googledrive \
-recursive upload backup import export apps script geocoding'''
+recursive upload backup import export apps script geocoding spreadsheet'''
 PKG_DSC = '''\
 recursive upload to Google Drive \
-( supports OAuth2, Calendar, Gmail, geocoding, etc ) \
+( supports OAuth2, Calendar, Gmail, geocoding, spreadsheet, etc ) \
 and import-export Google Apps Script source code'''
 
 PYPI_PKGSRC = 'https://pypi.python.org/packages/source'

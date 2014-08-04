@@ -2,7 +2,7 @@ googleDriveAccess
 =================
 
 a Python tool to Access to the Google Drive
-( OAuth2, Calendar, Gmail, geocoding, etc )
+( OAuth2, Calendar, Gmail, geocoding, spreadsheet, etc )
 
 Package Documentation https://github.com/HatsuneMiku/googleDriveAccess/wiki/module_googleDriveAccess
 
