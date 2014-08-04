@@ -20,9 +20,23 @@ def main(basedir):
   print ss.sheetId
   print ss.sheet()['title']
   for ws in ss.worksheets():
-    print u'%s : %s' % (ws.get_worksheet_id(), ws.title.text)
-  for cell in ss.cells():
-    print u'%s : %s' % (cell.title.text, cell.content.text)
+    id_uri = ws.get_id()
+    uri_base, sheetId, worksheetId = id_uri.rsplit('/', 2)
+    print u'%s : %s : %s' % (sheetId, ws.get_worksheet_id(), ws.title.text)
+  cells = ss.cells()
+  for n, cell in enumerate(cells):
+    # print u'%s : %s' % (cell.title.text, cell.content.text)
+    print u'    %4d %4s %3d %3d %8s' % (n, cell.title.text,
+      int(cell.cell.row), int(cell.cell.col), cell.content.text)
+  j = -1
+  for n, cell in enumerate(cells):
+    k = int(cell.cell.row) - 1
+    if k != j:
+      j = k
+      if j: sys.stdout.write('\n')
+    # *** will be skipped many cells that has no data ***
+    sys.stdout.write('%7s' % cell.content.text)
+  if j: sys.stdout.write('\n')
 
 if __name__ == '__main__':
   logging.getLogger().setLevel(getattr(logging, 'INFO')) # ERROR
