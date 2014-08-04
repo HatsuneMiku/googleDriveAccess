@@ -271,6 +271,8 @@ PyPI https://pypi.python.org/pypi/googleDriveAccess
 Relations
 ---------
 
+oauth2client-gdata-bridge https://github.com/hnakamur/gae-oauth2client-spreadsheet
+
 pytz-memcache https://github.com/HatsuneMiku/pytz-memcache
 
 pytz-memcache (PyPI) https://pypi.python.org/pypi/pytz-memcache
