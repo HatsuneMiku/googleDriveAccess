@@ -30,6 +30,14 @@ def main(basedir):
       int(cell.cell.row), int(cell.cell.col), cell.content.text)
 
   if False: # test skip
+    '''
+    packaged version of gdata-2.0.18 does NOT contain update_cell()
+    (pip install gdata) or (easy_install gdata)
+    some functions are added after gdata-2.0.18
+    https://code.google.com/p/gdata-python-client/source/list
+    please clone new version (python setup.py install)
+    hg clone https://code.google.com/p/gdata-python-client/
+    '''
     ss.ssc.update_cell(ss.sheetId, ss.worksheetId, 1, 1, u'日本語表示')
     ss.ssc.update_cell(ss.sheetId, ss.worksheetId, 3, 3, u'漢字')
 
