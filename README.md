@@ -84,12 +84,19 @@ print geo.getLatLng(geo.getLocation(35.75, 136.02))
 # spreadsheet
 ss = gda.SpreadsheetFactory(abc=oa2)(sheetName='test_spreadsheet_factory')
 print ss.oa2act
-print ss.sheetId
 print ss.sheet()['title']
+print ss.sheetId
+print ss.worksheetId
 for ws in ss.worksheets():
   print u'%s : %s' % (ws.get_worksheet_id(), ws.title.text)
 for cell in ss.cells():
   print u'%s : %s' % (cell.title.text, cell.content.text)
+
+# change True when you get a version (2013-07-12) after gdata-2.0.18
+# https://code.google.com/p/gdata-python-client/source/list
+if False:
+  ss.updateCell(1, 1, u'日本語表示')
+  ss.updateCell(3, 3, u'漢字')
 ```
 
 

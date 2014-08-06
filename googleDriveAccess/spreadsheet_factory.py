@@ -70,3 +70,19 @@ class SpreadsheetFactory(DAClient):
     if sheetId is None: sheetId = self.sheetId
     if worksheetId is None: worksheetId = self.worksheetId
     return self.ssc.get_cells(sheetId, worksheetId).entry
+
+  def updateCell(self, row, col, val, sheetId=None, worksheetId=None):
+    '''
+    packaged version of gdata-2.0.18 does NOT contain update_cell()
+    (pip install gdata) or (easy_install gdata)
+    version (2013-07-12) some functions are added after gdata-2.0.18
+    https://code.google.com/p/gdata-python-client/source/list
+    please clone new version (python setup.py install)
+    hg clone https://code.google.com/p/gdata-python-client/
+
+    and bug is reported: http://stackoverflow.com/questions/9940578/
+    add parameter force=True to fix it
+    '''
+    if sheetId is None: sheetId = self.sheetId
+    if worksheetId is None: worksheetId = self.worksheetId
+    return self.ssc.update_cell(sheetId, worksheetId, row, col, val, force=True)

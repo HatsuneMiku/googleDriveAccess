@@ -14,11 +14,22 @@ logging.basicConfig()
 
 SHEET_NAME = 'test_spreadsheet_factory'
 
+def trimWidth(s, m=72):
+  from unicodedata import east_asian_width
+  L = {'Na': 1, 'W': 2, 'F': 2, 'H': 1, 'A': 2, 'N': 1}
+  u, w = [], 0
+  for c in s:
+    w += L[east_asian_width(c)]
+    if w > m: break
+    u.append(c)
+  return u''.join(u)
+
 def main(basedir):
   ss = gda.SpreadsheetFactory(basedir)(sheetName=SHEET_NAME)
   print ss.oa2act
-  print ss.sheetId
   print ss.sheet()['title']
+  print ss.sheetId
+  print ss.worksheetId
   for ws in ss.worksheets():
     id_uri = ws.get_id()
     uri_base, sheetId, worksheetId = id_uri.rsplit('/', 2)
@@ -26,20 +37,14 @@ def main(basedir):
   cells = ss.cells()
   for n, cell in enumerate(cells):
     # print u'%s : %s' % (cell.title.text, cell.content.text)
-    print u'    %4d %4s %3d %3d %8s' % (n, cell.title.text,
+    print u'    %4d %4s %3d %3d %-8s' % (n, cell.title.text,
       int(cell.cell.row), int(cell.cell.col), cell.content.text)
 
-  if False: # test skip
-    '''
-    packaged version of gdata-2.0.18 does NOT contain update_cell()
-    (pip install gdata) or (easy_install gdata)
-    some functions are added after gdata-2.0.18
-    https://code.google.com/p/gdata-python-client/source/list
-    please clone new version (python setup.py install)
-    hg clone https://code.google.com/p/gdata-python-client/
-    '''
-    ss.ssc.update_cell(ss.sheetId, ss.worksheetId, 1, 1, u'日本語表示')
-    ss.ssc.update_cell(ss.sheetId, ss.worksheetId, 3, 3, u'漢字')
+  # change True when you get a version (2013-07-12) after gdata-2.0.18
+  # https://code.google.com/p/gdata-python-client/source/list
+  if False:
+    ss.updateCell(1, 1, u'日本語表示')
+    ss.updateCell(3, 3, u'漢字')
 
   print u'-' * 72
   j, c = -1, 0
@@ -53,9 +58,9 @@ def main(basedir):
     col = int(cell.cell.col)
     c += 1
     while c < col:
-      sys.stdout.write(' ' * 7)
+      sys.stdout.write(' ' * 13)
       c += 1
-    sys.stdout.write('%7s' % cell.content.text)
+    print trimWidth(u'%-12s' % cell.content.text, 12),
   if j: sys.stdout.write('\n')
 
 if __name__ == '__main__':
