@@ -23,7 +23,7 @@ PKG_KWD = '''\
 GAE google app engine client api OAuth2 gmail mail calendar drive googledrive \
 recursive upload backup import export apps script geocoding spreadsheet'''
 PKG_DSC = '''\
-recursive upload to Google Drive \
+update spreadsheet with OAuth2 and recursive upload to Google Drive \
 ( supports OAuth2, Calendar, Gmail, geocoding, spreadsheet, etc ) \
 and import-export Google Apps Script source code'''
 
