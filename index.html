@@ -122,12 +122,19 @@
 <span class="c"># spreadsheet</span>
 <span class="n">ss</span> <span class="o">=</span> <span class="n">gda</span><span class="o">.</span><span class="n">SpreadsheetFactory</span><span class="p">(</span><span class="n">abc</span><span class="o">=</span><span class="n">oa2</span><span class="p">)(</span><span class="n">sheetName</span><span class="o">=</span><span class="s">'test_spreadsheet_factory'</span><span class="p">)</span>
 <span class="k">print</span> <span class="n">ss</span><span class="o">.</span><span class="n">oa2act</span>
-<span class="k">print</span> <span class="n">ss</span><span class="o">.</span><span class="n">sheetId</span>
 <span class="k">print</span> <span class="n">ss</span><span class="o">.</span><span class="n">sheet</span><span class="p">()[</span><span class="s">'title'</span><span class="p">]</span>
+<span class="k">print</span> <span class="n">ss</span><span class="o">.</span><span class="n">sheetId</span>
+<span class="k">print</span> <span class="n">ss</span><span class="o">.</span><span class="n">worksheetId</span>
 <span class="k">for</span> <span class="n">ws</span> <span class="ow">in</span> <span class="n">ss</span><span class="o">.</span><span class="n">worksheets</span><span class="p">():</span>
   <span class="k">print</span> <span class="s">u'</span><span class="si">%s</span><span class="s"> : </span><span class="si">%s</span><span class="s">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">ws</span><span class="o">.</span><span class="n">get_worksheet_id</span><span class="p">(),</span> <span class="n">ws</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">ss</span><span class="o">.</span><span class="n">cells</span><span class="p">():</span>
   <span class="k">print</span> <span class="s">u'</span><span class="si">%s</span><span class="s"> : </span><span class="si">%s</span><span class="s">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">cell</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+<span class="c"># change True when you get a version (2013-07-12) after gdata-2.0.18</span>
+<span class="c"># https://code.google.com/p/gdata-python-client/source/list</span>
+<span class="k">if</span> <span class="bp">False</span><span class="p">:</span>
+  <span class="n">ss</span><span class="o">.</span><span class="n">updateCell</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">u'日本語表示'</span><span class="p">)</span>
+  <span class="n">ss</span><span class="o">.</span><span class="n">updateCell</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s">u'漢字'</span><span class="p">)</span>
 </pre></div>
 
 <h2>
@@ -274,6 +281,8 @@ So it may correct to catch the exception and retry with 'binary/octet-stream'.
 
 <h2>
 <a name="relations" class="anchor" href="#relations"><span class="octicon octicon-link"></span></a>Relations</h2>
+
+<p>oauth2client-gdata-bridge <a href="https://github.com/hnakamur/gae-oauth2client-spreadsheet">https://github.com/hnakamur/gae-oauth2client-spreadsheet</a></p>
 
 <p>pytz-memcache <a href="https://github.com/HatsuneMiku/pytz-memcache">https://github.com/HatsuneMiku/pytz-memcache</a></p>
 
