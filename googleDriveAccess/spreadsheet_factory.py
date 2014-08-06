@@ -1,6 +1,10 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 '''spreadsheet_factory
+gdata.spreadsheets.client.SpreadsheetsClient by OAuth2 auth_token
+https://code.google.com/p/gdata-python-client/source/browse/src/gdata/spreadsheets/client.py
+gdata.spreadsheet.text_db.DatabaseClient has no auth_token parameter
+https://code.google.com/p/gdata-python-client/source/browse/src/gdata/spreadsheet/text_db.py
 '''
 
 import sys, os
@@ -17,10 +21,8 @@ from da_client import DAClient
 class SpreadsheetFactory(DAClient):
   def __init__(self, basedir=None, **kwargs):
     super(SpreadsheetFactory, self).__init__(basedir, **kwargs)
-    self.ssc = self.getSpreadsheetsClient()
-
-  def getSpreadsheetsClient(self):
-    return SpreadsheetsClient(auth_token=OAuth2BearerToken(self.credentials))
+    self.bearerToken = OAuth2BearerToken(self.credentials)
+    self.ssc = SpreadsheetsClient(auth_token=self.bearerToken)
 
   def __call__(self, **kwargs):
     '''
@@ -68,3 +70,19 @@ class SpreadsheetFactory(DAClient):
     if sheetId is None: sheetId = self.sheetId
     if worksheetId is None: worksheetId = self.worksheetId
     return self.ssc.get_cells(sheetId, worksheetId).entry
+
+  def updateCell(self, row, col, val, sheetId=None, worksheetId=None):
+    '''
+    packaged version of gdata-2.0.18 does NOT contain update_cell()
+    (pip install gdata) or (easy_install gdata)
+    version (2013-07-12) some functions are added after gdata-2.0.18
+    https://code.google.com/p/gdata-python-client/source/list
+    please clone new version (python setup.py install)
+    hg clone https://code.google.com/p/gdata-python-client/
+
+    and bug is reported: http://stackoverflow.com/questions/9940578/
+    add parameter force=True to fix it
+    '''
+    if sheetId is None: sheetId = self.sheetId
+    if worksheetId is None: worksheetId = self.worksheetId
+    return self.ssc.update_cell(sheetId, worksheetId, row, col, val, force=True)
