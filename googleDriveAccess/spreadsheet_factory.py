@@ -9,6 +9,7 @@ https://code.google.com/p/gdata-python-client/source/browse/src/gdata/spreadshee
 
 import sys, os
 import httplib2
+from apiclient.http import MediaInMemoryUpload
 from gdata.spreadsheets.client import SpreadsheetsClient
 from oauth2client_gdata_bridge import OAuth2BearerToken
 from oauth2client.client import AccessTokenRefreshError
@@ -86,3 +87,16 @@ class SpreadsheetFactory(DAClient):
     if sheetId is None: sheetId = self.sheetId
     if worksheetId is None: worksheetId = self.worksheetId
     return self.ssc.update_cell(sheetId, worksheetId, row, col, val, force=True)
+
+  def createEmptySpreadsheet(self, sheetName, description=None, parentId=None,
+    rows=1000, cols=26):
+    body = {'title': sheetName, 'mimeType': 'text/csv', # to be converted
+      'description': description if description else sheetName}
+    if parentId is None: parentId = 'root'
+    body['parents'] = [{'id': parentId}]
+    mbody = MediaInMemoryUpload('\n'.join([',' * cols] * rows),
+      mimetype='text/csv', chunksize=256*1024, resumable=False)
+    req = self.service.files().insert(body=body, media_body=mbody)
+    req.uri += '&convert=true'
+    fileObj = req.execute()
+    return (fileObj['id'], fileObj)
