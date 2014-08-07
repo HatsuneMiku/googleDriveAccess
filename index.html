@@ -120,7 +120,10 @@
 <span class="k">print</span> <span class="n">geo</span><span class="o">.</span><span class="n">getLatLng</span><span class="p">(</span><span class="n">geo</span><span class="o">.</span><span class="n">getLocation</span><span class="p">(</span><span class="mf">35.75</span><span class="p">,</span> <span class="mf">136.02</span><span class="p">))</span>
 
 <span class="c"># spreadsheet</span>
-<span class="n">ss</span> <span class="o">=</span> <span class="n">gda</span><span class="o">.</span><span class="n">SpreadsheetFactory</span><span class="p">(</span><span class="n">abc</span><span class="o">=</span><span class="n">oa2</span><span class="p">)(</span><span class="n">sheetName</span><span class="o">=</span><span class="s">'test_spreadsheet_factory'</span><span class="p">)</span>
+<span class="n">SHEET_NAME</span> <span class="o">=</span> <span class="s">'test_spreadsheet_factory'</span>
+<span class="n">ss</span> <span class="o">=</span> <span class="n">gda</span><span class="o">.</span><span class="n">SpreadsheetFactory</span><span class="p">(</span><span class="n">abc</span><span class="o">=</span><span class="n">oa2</span><span class="p">)(</span><span class="n">sheetName</span><span class="o">=</span><span class="n">SHEET_NAME</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">ss</span><span class="o">.</span><span class="n">sheetId</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+  <span class="n">ss</span><span class="o">.</span><span class="n">createSpreadsheet</span><span class="p">(</span><span class="n">SHEET_NAME</span><span class="p">,</span> <span class="n">csv</span><span class="o">=</span><span class="s">'c1,c2,c3</span><span class="se">\n</span><span class="s">8,32,256</span><span class="se">\n</span><span class="s">64,1024,65536</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
 <span class="k">print</span> <span class="n">ss</span><span class="o">.</span><span class="n">oa2act</span>
 <span class="k">print</span> <span class="n">ss</span><span class="o">.</span><span class="n">sheet</span><span class="p">()[</span><span class="s">'title'</span><span class="p">]</span>
 <span class="k">print</span> <span class="n">ss</span><span class="o">.</span><span class="n">sheetId</span>
