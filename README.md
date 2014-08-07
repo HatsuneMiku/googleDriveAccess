@@ -82,7 +82,10 @@ print geo.getLocation(*geo.getLatLng(u'福井県敦賀市明神町'))
 print geo.getLatLng(geo.getLocation(35.75, 136.02))
 
 # spreadsheet
-ss = gda.SpreadsheetFactory(abc=oa2)(sheetName='test_spreadsheet_factory')
+SHEET_NAME = 'test_spreadsheet_factory'
+ss = gda.SpreadsheetFactory(abc=oa2)(sheetName=SHEET_NAME)
+if ss.sheetId is None:
+  ss.createSpreadsheet(SHEET_NAME, csv='c1,c2,c3\n8,32,256\n64,1024,65536\n')
 print ss.oa2act
 print ss.sheet()['title']
 print ss.sheetId
