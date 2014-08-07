@@ -26,6 +26,8 @@ def trimWidth(s, m=72):
 
 def main(basedir):
   ss = gda.SpreadsheetFactory(basedir)(sheetName=SHEET_NAME)
+  if ss.sheetId is None:
+    ss.createSpreadsheet(SHEET_NAME, csv='c1,c2,c3\n8,32,256\n64,1024,65536\n')
   print ss.oa2act
   print ss.sheet()['title']
   print ss.sheetId

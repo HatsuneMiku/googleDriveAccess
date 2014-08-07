@@ -9,6 +9,7 @@ https://code.google.com/p/gdata-python-client/source/browse/src/gdata/spreadshee
 
 import sys, os
 import httplib2
+from apiclient.http import MediaInMemoryUpload
 from gdata.spreadsheets.client import SpreadsheetsClient
 from oauth2client_gdata_bridge import OAuth2BearerToken
 from oauth2client.client import AccessTokenRefreshError
@@ -39,17 +40,22 @@ class SpreadsheetFactory(DAClient):
 
   def set_activesheet(self):
     if self.sheetId is None:
-      q = "mimeType='%s'" % SPREADSHEET_TYPE
-      if self.sheetName: q = "%s and title contains '%s'" % (q, self.sheetName)
-      if self.parentId: q = "%s and '%s' in parents" % (q, self.parentId)
-      entries = self.execQuery(q, noprint=True)
+      q = ["mimeType='%s'" % SPREADSHEET_TYPE]
+      if self.sheetName: q.append("title contains '%s'" % self.sheetName)
+      if self.parentId: q.append("'%s' in parents" % self.parentId)
+      q.append('explicitlyTrashed=False')
+      entries = self.execQuery(' and '.join(q), noprint=True)
       if not len(entries['items']):
+        self.sheetId = None
+        self.worksheetId = None
         sys.stderr.write('not found: %s\n' % q)
         return
       self.sheetId = entries['items'][0]['id']
     for ws in self.worksheets():
       self.worksheetId = ws.get_worksheet_id()
       break
+    else:
+      self.worksheetId = None
 
   def sheet(self, sheetId=None):
     if sheetId is None: sheetId = self.sheetId
@@ -86,3 +92,27 @@ class SpreadsheetFactory(DAClient):
     if sheetId is None: sheetId = self.sheetId
     if worksheetId is None: worksheetId = self.worksheetId
     return self.ssc.update_cell(sheetId, worksheetId, row, col, val, force=True)
+
+  def createSpreadsheet(self, sheetName, description=None, parentId=None,
+    csv=None, rows=1000, cols=26):
+    '''
+    sheetName: file name for Google Drive
+    description: description for Google Drive (default same as sheetName)
+    parentId: create into parent folder (default 'root')
+    csv: string (default None: empty sheet)
+    rows: int (default 1000)
+    cols: int (default 26)
+    '''
+    body = {'title': sheetName, 'mimeType': 'text/csv', # to be converted
+      'description': description if description else sheetName}
+    if parentId is None: parentId = 'root'
+    body['parents'] = [{'id': parentId}]
+    mbody = MediaInMemoryUpload(csv if csv else '\n'.join([',' * cols] * rows),
+      mimetype='text/csv', chunksize=256*1024, resumable=False)
+    req = self.service.files().insert(body=body, media_body=mbody)
+    req.uri += '&convert=true'
+    fileObj = req.execute()
+    if fileObj is None: return (None, None)
+    self.sheetId = fileObj['id']
+    self.set_activesheet()
+    return (self.sheetId, fileObj)
