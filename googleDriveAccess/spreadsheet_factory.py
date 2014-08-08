@@ -107,7 +107,13 @@ class SpreadsheetFactory(DAClient):
       'description': description if description else sheetName}
     if parentId is None: parentId = 'root'
     body['parents'] = [{'id': parentId}]
-    mbody = MediaInMemoryUpload(csv if csv else '\n'.join([',' * cols] * rows),
+    line = [',' * cols]
+    if csv:
+      lines = csv.splitlines()
+      dat = lines + (line * (rows - len(lines)))
+    else:
+      dat = line * rows
+    mbody = MediaInMemoryUpload('\n'.join(dat),
       mimetype='text/csv', chunksize=256*1024, resumable=False)
     req = self.service.files().insert(body=body, media_body=mbody)
     req.uri += '&convert=true'
